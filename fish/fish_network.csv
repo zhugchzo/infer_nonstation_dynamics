@@ -1,0 +1,15 @@
+﻿,Aurelia.sp,Plotosus.japonicus,Sebastes.cheni,Trachurus.japonicus,Girella.punctata,Pseudolabrus.sieboldi,Parajulis.poecilopterus,Halichoeres.tenuispinnis,Chaenogobius.gulosus,Pterogobius.zonoleucus,Tridentiger.trigonocephalus,Siganus.fuscescens,Sphyraena.pinguis,Rudarius.ercodes
+Aurelia.sp,2,0,0,0,0,0,0,0,0,0,0,0,0,0
+Plotosus.japonicus,0,2,0,0,0,1,0,0,0,0,1,0,0,0
+Sebastes.cheni,0,0,2,0,0,0,0,0,0,0,0,0,0,0
+Trachurus.japonicus,1,0,0,2,0,0,0,0,0,0,0,0,1,0
+Girella.punctata,0,0,0,0,2,0,0,0,0,1,0,0,0,0
+Pseudolabrus.sieboldi,0,0,0,0,0,2,0,0,0,0,0,0,0,0
+Parajulis.poecilopterus,0,0,1,0,0,0,2,0,0,0,0,0,0,0
+Halichoeres.tenuispinnis,0,0,0,0,0,0,1,2,0,0,0,0,0,0
+Chaenogobius.gulosus,0,0,0,0,0,0,0,0,2,0,0,0,0,0
+Pterogobius.zonoleucus,0,0,0,0,0,1,0,0,1,2,0,0,0,1
+Tridentiger.trigonocephalus,0,0,0,0,0,0,0,0,1,0,2,0,0,0
+Siganus.fuscescens,0,0,0,0,0,0,1,0,0,0,0,2,0,0
+Sphyraena.pinguis,0,0,0,1,0,0,0,0,0,0,0,0,2,0
+Rudarius.ercodes,0,0,0,1,0,0,0,0,0,0,0,0,0,2
