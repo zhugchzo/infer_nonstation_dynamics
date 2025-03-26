@@ -34,8 +34,8 @@ N = len(col_x)
 for rand_seed in range(100):
 
     # Load the saved data
-    df_tseries = pd.read_csv('Koscillators_data/Koscillators_data_{}.csv'.format(rand_seed))
-    df_network = pd.read_csv('Koscillators_data/Koscillators_network_{}.csv'.format(rand_seed),header=None)
+    df_tseries = pd.read_csv('../Koscillators_data/Koscillators_data_{}.csv'.format(rand_seed))
+    df_network = pd.read_csv('../Koscillators_data/Koscillators_network_{}.csv'.format(rand_seed),header=None)
 
     data_network = df_network.values
 

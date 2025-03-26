@@ -40,7 +40,7 @@ for al in [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2]:
         df_W_out_t = pd.read_csv('../results/cusp/robust/cusp_W_out_t_{}_{}.csv'.format(al,bl))
         df_W_out_AIC = pd.read_csv('../results/cusp/robust/cusp_W_out_AIC_{}_{}.csv'.format(al,bl))
 
-        df_ab = pd.read_csv('../cusp/robust/cusp_data/cusp_data_{}_{}.csv'.format(al,bl))
+        df_ab = pd.read_csv('../cusp/cusp_data/cusp_data_{}_{}.csv'.format(al,bl))
 
         one = np.ones(length)
 

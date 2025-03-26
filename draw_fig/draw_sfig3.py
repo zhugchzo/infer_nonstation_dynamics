@@ -102,7 +102,7 @@ for i in range(4):
                 legend_abundance = mlines.Line2D([], [], color='black', marker='none', linestyle='-', linewidth=2)
                 legend_temperature = mlines.Line2D([], [], color='royalblue', marker='none', linestyle='-', linewidth=2)
                 legend_vv = mlines.Line2D([], [], color='crimson', marker='none', linestyle='--', linewidth=2)
-                ax.legend(handles=[legend_abundance,legend_temperature,legend_vv],labels=['Abundance','Water temperature','virtual variable'],loc='center',frameon=False, handlelength=1, prop={'size':24})
+                ax.legend(handles=[legend_abundance,legend_temperature,legend_vv],labels=['Abundance','Water temperature','Virtual variable'],loc='center',frameon=False, handlelength=1, prop={'size':24})
 
 
     elif i == 3:

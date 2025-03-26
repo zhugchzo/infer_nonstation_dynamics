@@ -23,7 +23,7 @@ dt = 0.01
 for al in [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2]:
     for bl in [4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5]:
 
-        df_tseries = pd.read_csv('cusp_data/cusp_data_{}_{}.csv'.format(al,bl))
+        df_tseries = pd.read_csv('../cusp_data/cusp_data_{}_{}.csv'.format(al,bl))
         keep_col_tseries = ['x','t']
         new_f_tseries = df_tseries[keep_col_tseries]
         values_tseries = new_f_tseries.values

@@ -9,123 +9,105 @@ font_y = {'family':'Arial','weight':'normal','size': 20}
 plt.rcParams['font.family'] = 'Arial'
 plt.rcParams['axes.labelweight'] = 'bold'
 
-df_tseries = pandas.read_csv('../UAV/UAV_data.csv')
-df_pred = pandas.read_csv('../results/UAV/UAV_pred.csv')
-df_gen = pandas.read_csv('../results/UAV/UAV_gen.csv')
+df_tseries = pandas.read_csv('../mitochondria/mitochondria_data.csv')
+df_pred = pandas.read_csv('../results/mitochondria/mitochondria_pred.csv')
+df_gen = pandas.read_csv('../results/mitochondria/mitochondria_gen.csv')
 
 train_length = len(df_tseries) - len(df_pred) - 1
 
-x = df_tseries['x']
-y = df_tseries['y']
-pred_x = df_pred['pred_x']
-pred_y = df_pred['pred_y']
-gen_x = df_gen['gen_x']
-gen_y = df_gen['gen_y']
-train_x = df_tseries['x'][:train_length]
-train_y = df_tseries['y'][:train_length]
+t1 = df_tseries['Time']
+t2 = df_pred['Time']
+t3 = df_tseries[:train_length]['Time']
+
+rfr = df_tseries['Relative fluorescence ratio']
+# train_rfr = df_tseries[:train_length]['Relative fluorescence ratio']
+train_rfr = df_gen['gen'][:train_length]
+pred_rfr = df_pred['pred']
+gen_rfr = df_gen['gen']
+
+initial_t = t1.iloc[0]
+end_t = t1.iloc[-1]
+initial_theta = df_gen['theta'].iloc[0] - (df_gen['theta'].iloc[1] - df_gen['theta'].iloc[0])
+end_theta =  df_gen['theta'].iloc[-1]
 
 fig, axs = plt.subplots(1, 2, figsize=(12,6))
 (ax1, ax2) = axs.flatten()
 
+# fold bifurcation
+
+t_fold = initial_t + (1.24329-initial_theta)/(end_theta-initial_theta)*(end_t-initial_t)
+# print(t_fold)
+df_gen['distance'] = (df_gen['Time'] - t_fold).abs()
+closest_row = df_gen.loc[df_gen['distance'].idxmin()]
+x_fold = closest_row['gen']
+
 # ax1
 
-ax1.plot(x,y,c='black',zorder=2)
-ax1.scatter(x,y,s=10,c='black',marker='o',zorder=2)
-ax1.scatter(x.iloc[0], y.iloc[0], color='royalblue',s=150,zorder=4,marker=(5,1))  # Mark the start point
-ax1.scatter(pred_x,pred_y,s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
+ax1.plot(t1,rfr,c='black',zorder=2)
+ax1.scatter(t1,rfr,s=10,c='black',marker='o',zorder=2)
+ax1.scatter(t2,pred_rfr,s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
 
-ax1.fill_between(train_x, train_y-0.05, train_y+0.05, color='silver', alpha=0.9, linewidth=0, zorder=1)
+ax1.scatter(t_fold,x_fold,s=180, marker='o',facecolors='white', edgecolors='black',zorder=5)
 
-ax1.annotate(
-    text='',
-    xy=(2.3, 0.82),
-    xytext=(2, 0.7),
-    arrowprops=dict(arrowstyle='->', color='black', lw=3)
-)
-
-ax1.annotate(
-    text='',
-    xy=(6.3, 1.2),
-    xytext=(6, 1.3),
-    arrowprops=dict(arrowstyle='->', color='black', lw=3)
-)
-
-ax1.annotate(
-    text='',
-    xy=(8.7, 1.2),
-    xytext=(8.1, 1.1),
-    arrowprops=dict(arrowstyle='->', color='black', lw=3)
-)
+ax1.fill_between(t3,train_rfr-0.005,train_rfr+0.005,color='silver',alpha=0.9,linewidth=0,zorder=1)
 
 legend_state = mlines.Line2D([], [], color='black', marker='o', markersize=3, linestyle='-', markeredgewidth=1.5)
 legend_pstate = mlines.Line2D([], [], markerfacecolor='none',color='crimson', marker='o', markersize=5, linestyle='None', markeredgewidth=1.5)
-legend_start = mlines.Line2D([], [], color='royalblue', marker=(5,1), markersize=6, linestyle='None', markeredgewidth=1.5)
+legend_fold = mlines.Line2D([], [], markerfacecolor='white',color='black', marker='o', markersize=5, linestyle='None', markeredgewidth=1.5)
 legend_fill = mpatches.Patch(color='silver', alpha=0.9, linewidth=0)
 
-ax1.legend(handles=[legend_state,legend_pstate,legend_start,legend_fill],labels=['Odometry path','Prediction','Start','Training data'],loc='center', frameon=False, bbox_to_anchor=(0.72, 0.25), markerscale=2.5,prop={'size':18})
+ax1.legend(handles=[legend_state,legend_pstate,legend_fold,legend_fill],labels=['ATP concentration','Prediction','Predicted fold bifurcation','Training data'],loc='center', frameon=False, bbox_to_anchor=(0.35, 0.3), markerscale=2.5,prop={'size':18})
 
-ax1.set_xlabel('X Position (m)',font_x,labelpad=-13)
-ax1.set_ylabel('Y Position (m)',font_y,labelpad=-15)
-ax1.set_xlim(-1,11.5)
-ax1.set_xticks([0,10])
-ax1.set_ylim(0.1,1.5)
-ax1.set_yticks([0.4,1.2])
+ax1.set_xlabel('Time (min)',font_x,labelpad=-13)
+ax1.set_ylabel('Relative fluorescence ratio (%)',font_y)
+ax1.set_xlim(1.8,5.1)
+ax1.set_xticks([2,5])
+ax1.set_ylim(0.71,0.9)
+ax1.set_yticks([0.72,0.88])
+ax1.set_yticklabels(['72','88'])
+ax1.tick_params(direction='in')
 
-ax1.text(-0.075, 0.95,'a',ha='left', transform=ax1.transAxes,fontdict={'family':'DejaVu Sans','size':20,'weight':'bold'})
+ax1.yaxis.set_label_coords(-0.05, 0.48)
+
+ax1.text(-0.075, 0.96,'a',ha='left', transform=ax1.transAxes,fontdict={'family':'DejaVu Sans','size':20,'weight':'bold'})
 
 ax1.tick_params(axis='x', labelsize=18)
 ax1.tick_params(axis='y', labelsize=18)
-ax1.tick_params(direction='in')
 
 # ax2
 
-ax2.plot(x,y,c='black',zorder=2)
-ax2.scatter(x,y,s=10,c='black',marker='o',zorder=2)
-ax2.scatter(x.iloc[0], y.iloc[0], color='royalblue',s=150,zorder=4,marker=(5,1))  # Mark the start point
-ax2.scatter(gen_x,gen_y,s=50,marker='o',facecolors='none',edgecolors='darkorange',zorder=3)
+ax2.plot(t1,rfr,c='black',zorder=2)
+ax2.scatter(t1,rfr,s=10,c='black',marker='o',zorder=2)
+ax2.scatter(t1[1:],gen_rfr,s=50,marker='o',facecolors='none',edgecolors='darkorange',zorder=3)
 
-ax2.annotate(
-    text='',
-    xy=(4.1, 0.92),
-    xytext=(3.8, 0.8),
-    arrowprops=dict(arrowstyle='->', color='black', lw=3)
-)
-
-ax2.annotate(
-    text='',
-    xy=(6.3, 1.2),
-    xytext=(6, 1.3),
-    arrowprops=dict(arrowstyle='->', color='black', lw=3)
-)
-
-ax2.annotate(
-    text='',
-    xy=(8.7, 1.2),
-    xytext=(8.1, 1.1),
-    arrowprops=dict(arrowstyle='->', color='black', lw=3)
-)
+ax2.scatter(t_fold,x_fold,s=180, marker='o',facecolors='white', edgecolors='black',zorder=5)
 
 legend_state = mlines.Line2D([], [], color='black', marker='o', markersize=3, linestyle='-', markeredgewidth=1.5)
 legend_gstate = mlines.Line2D([], [], markerfacecolor='none',color='darkorange', marker='o', markersize=5, linestyle='None', markeredgewidth=1.5)
-legend_start = mlines.Line2D([], [], color='royalblue',marker=(5,1), markersize=6, linestyle='None', markeredgewidth=1.5)
+legend_fold = mlines.Line2D([], [], markerfacecolor='white',color='black', marker='o', markersize=5, linestyle='None', markeredgewidth=1.5)
 
-ax2.legend(handles=[legend_state,legend_gstate,legend_start],labels=['Odometry path','Generation','Start'],loc='center', frameon=False, bbox_to_anchor=(0.72, 0.25), markerscale=2.5,prop={'size':18})
+ax2.legend(handles=[legend_state,legend_gstate,legend_fold],labels=['ATP concentration','Generation','Predicted fold bifurcation'],loc='center', frameon=False, bbox_to_anchor=(0.35, 0.3), markerscale=2.5,prop={'size':18})
 
-ax2.set_xlabel('X Position (m)',font_x,labelpad=-13)
-ax2.set_xlim(-1,11.5)
-ax2.set_xticks([0,10])
-ax2.set_ylim(0.1,1.5)
-ax2.set_yticks([0.4,1.2])
+ax2.set_xlabel('Time (min)',font_x,labelpad=-13)
+ax2.set_xlim(1.8,5.1)
+ax2.set_xticks([2,5])
+ax2.set_ylim(0.71,0.9)
+ax2.set_yticks([0.72,0.88])
+ax2.set_yticklabels(['72','88'])
+ax2.tick_params(direction='in')
 
-ax2.text(-0.075, 0.95,'b',ha='left', transform=ax2.transAxes,fontdict={'family':'DejaVu Sans','size':20,'weight':'bold'})
+ax2.text(-0.075, 0.96,'b',ha='left', transform=ax2.transAxes,fontdict={'family':'DejaVu Sans','size':20,'weight':'bold'})
 
 ax2.tick_params(axis='x', labelsize=18)
 ax2.tick_params(axis='y', labelsize=18)
-ax2.tick_params(direction='in')
 
 plt.subplots_adjust(top=0.98, bottom=0.07, left=0.05, right=0.99, wspace=0.15)
 plt.savefig('../figures/FIG3.pdf',format='pdf')
 plt.savefig('/Users/zhugchzo/Desktop/3paper_fig/FIG3.png',format='png',dpi=600)
+
+
+
+
 
 
 
