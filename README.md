@@ -22,9 +22,9 @@ within a new virtual environment.
 
 **./mitochondria:** Code to apply our virtual variable-based dynamical inference method to discover the governing equation and predict dynamics for the cellular system, and to use AUTO-07P to identify bifurcation of the inferred equation.
 
-**./UAV:** Code to apply our virtual variable-based dynamical inference method to discover the governing equation and predict dynamics for the UAV navigation system.
+**./UAV:** Code to apply our virtual variable-based dynamical inference method to discover the governing equations and predict dynamics for the UAV navigation system.
 
-**./fish:** Code to apply our virtual variable-based dynamical inference method to discover the governing equation and predict dynamics for the natural marine fish community, and to test the correlation between the population fluctuation index and dynamic stability using the Kendall rank correlation test.
+**./fish:** Code to apply our virtual variable-based dynamical inference method to discover the governing equations and predict dynamics for the natural marine fish community, and to test the correlation between the population fluctuation index and dynamic stability using the Kendall rank correlation test.
 
 **./compute_sMAPE_NED:** Code to compute sMAPE and NED for the results of five test systems.
 
@@ -35,4 +35,14 @@ within a new virtual environment.
 **./draw_fig:** Code to generate figures used in manuscript and supplementary information.
 
 **./figures:** Figures used in manuscript and supplementary information.
+
+# Data sources
+
+The empirical data used in this study are available from the following sources:
+
+1. **Cellular energy depletion** data is availalble in the csv file `./mitochondria/mitochondria_data.csv`. Data was collected by S.Wagner et al. and was first published in [Wagner S, Steinbeck J, Fuchs P, et al. Multiparametric real‐time sensing of cytosolic physiology links hypoxia responses to mitochondrial electron transport[J]. New Phytologist, 2019, 224(4): 1668-1684.] (https://nph.onlinelibrary.wiley.com/doi/full/10.1111/nph.16093).
+
+2. **UAV obstacle avoidance trajectory** data is availalble in the csv file `./UAV/UAV_data.csv`. Data was collected by Zhefan Xu.
+
+3. **Marine fish community** data is in the csv files `./fish/fish_data.csv` and `./fish/fish_network.csv`. Data was collected by Reiji Masuda and was first published in [Ushio M, Hsieh C, Masuda R, et al. Fluctuating interaction network and time-varying stability of a natural fish community[J]. Nature, 2018, 554(7692): 360-363.] (https://www.nature.com/articles/nature25504).
 
