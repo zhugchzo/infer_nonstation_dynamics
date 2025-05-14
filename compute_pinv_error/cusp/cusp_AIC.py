@@ -16,12 +16,13 @@ dtot = dlin + dnonlin
 
 dt = 0.01
 
+MSE_list = list()
 pinv_error_list = list()
 
 for al in [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2]:
     for bl in [4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5]:
 
-        df_tseries = pd.read_csv('../../cusp/robust/cusp_data/cusp_data_{}_{}.csv'.format(al,bl))
+        df_tseries = pd.read_csv('../../cusp/cusp_data/cusp_data_{}_{}.csv'.format(al,bl))
         keep_col_tseries = ['x','t']
         new_f_tseries = df_tseries[keep_col_tseries]
         values_tseries = new_f_tseries.values
@@ -41,6 +42,8 @@ for al in [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2]:
 
         dic_sparse_W_out = {}
         dic_sparse_AIC = {}
+        dic_sparse_MSE = {}
+        dic_sparse_pinv = {}
 
         for initial_theta in grid_initial_theta:
 
@@ -82,6 +85,11 @@ for al in [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2]:
                             out_train[dlin + cnt + cte] = x_train[row1,:train_length] * x_train[row2,:train_length] * x_train[row3,:train_length]
                             cnt += 1
 
+                # compute the pseudo-inverse matrix error
+
+                pinv_error_matrix = np.linalg.pinv(out_train[:,:] @ out_train[:,:].T) @ (out_train[:,:] @ out_train[:,:].T) - np.identity(out_train.shape[0])
+                pinv_error = np.sum(pinv_error_matrix**2)# / out_train.shape[0]**2 
+
                 ##
                 ## SINDy
                 ##
@@ -105,7 +113,6 @@ for al in [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2]:
                         W_out_sparse[ind, biginds] = (x_train[ind,1: train_length + 1] - x_train[ind,:train_length])/dt @ out_train[biginds,:].T @ np.linalg.pinv(out_train[biginds,:] @ out_train[biginds,:].T)
 
                 dic_sparse_W_out['({},{})'.format(initial_theta,delta_theta)] = W_out_sparse[0]
-
 
         #####################################################################################
 
@@ -169,6 +176,8 @@ for al in [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2]:
                     AIC_sparse = 1e5
 
                 dic_sparse_AIC['({},{})'.format(initial_theta,delta_theta)] = AIC_sparse
+                dic_sparse_MSE['({},{})'.format(initial_theta,delta_theta)] = sparse_MSE
+                dic_sparse_pinv['({},{})'.format(initial_theta,delta_theta)] = pinv_error
 
         #####################################################################################
 
@@ -179,54 +188,16 @@ for al in [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2]:
 
         best_initial_theta, best_delta_theta = min_key.strip('()').split(',')
 
-        best_initial_theta = float(best_initial_theta)
-        best_delta_theta = float(best_delta_theta)
+        sparse_MSE = dic_sparse_MSE['({},{})'.format(best_initial_theta,best_delta_theta)]
+        pinv_error = dic_sparse_pinv['({},{})'.format(best_initial_theta,best_delta_theta)]
 
         #####################################################################################
 
-        theta = np.linspace(best_initial_theta, best_initial_theta + (length - 1) * best_delta_theta, length)
-
-        x_tseries = x_tseries.reshape(-1,1)
-        theta = theta.reshape(-1,1)
-
-        x_theta_tseries = np.hstack((x_tseries, theta))
-
-        # create an array to hold the linear part of the feature vector
-        x_train = np.zeros((dlin,train_length + 1))
-
-        # fill in the linear part of the feature vector for all times
-        for j in range(train_length + 1):
-            x_train[:,j] = x_theta_tseries[j]
-
-        # create an array to hold the full feature vector for training time
-        # (use ones so the constant term is already 1)
-        out_train = np.ones((dtot + cte,train_length))  
-
-        # copy over the linear part (shift over by one to account for constant if needed)
-        out_train[cte:dlin + cte,:] = x_train[:,:train_length]
-
-        # fill in the non-linear part, order = 2
-        cnt = 0
-        for row1 in range(dlin):
-            for row2 in range(row1,dlin):
-                # shift by one for constant if needed
-                out_train[dlin + cnt + cte] = x_train[row1,:train_length] * x_train[row2,:train_length]
-                cnt += 1
-
-        # fill in the non-linear part, order = 3
-        for row1 in range(dlin):
-            for row2 in range(row1,dlin):
-                for row3 in range(row2,dlin):
-                    out_train[dlin + cnt + cte] = x_train[row1,:train_length] * x_train[row2,:train_length] * x_train[row3,:train_length]
-                    cnt += 1
-
-        # compute the pseudo-inverse matrix error
-
-        pinv_error_matrix = np.linalg.pinv(out_train[:,:] @ out_train[:,:].T) @ (out_train[:,:] @ out_train[:,:].T) - np.identity(out_train.shape[0])
-        pinv_error = np.sum(pinv_error_matrix**2) / out_train.shape[0]**2
-
+        MSE_list.append(sparse_MSE)
         pinv_error_list.append(pinv_error)
 
+mean_MSE = np.mean(MSE_list)
 mean_pinv_error = np.mean(pinv_error_list)
 
+print('AIC MSE: {}'.format(mean_MSE))
 print('AIC pinv error: {}'.format(mean_pinv_error))

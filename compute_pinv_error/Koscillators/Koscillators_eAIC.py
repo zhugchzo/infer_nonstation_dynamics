@@ -27,13 +27,14 @@ col_x = ['x0', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7', 'x8', 'x9', 'x10']
 # the number of node
 N = len(col_x)
 
+MSE_list = list()
 pinv_error_list = list()
 
 for rand_seed in range(100):
 
     # Load the saved data
-    df_tseries = pd.read_csv('../../Koscillators/robust/Koscillators_data/Koscillators_data_{}.csv'.format(rand_seed))
-    df_network = pd.read_csv('../../Koscillators/robust/Koscillators_data/Koscillators_network_{}.csv'.format(rand_seed),header=None)
+    df_tseries = pd.read_csv('../../Koscillators/Koscillators_data/Koscillators_data_{}.csv'.format(rand_seed))
+    df_network = pd.read_csv('../../Koscillators/Koscillators_data/Koscillators_network_{}.csv'.format(rand_seed),header=None)
 
     data_network = df_network.values
 
@@ -56,7 +57,9 @@ for rand_seed in range(100):
     grid_delta_theta = [1e-5, 5e-5, 1e-4, 5e-4, 1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 5e-1, 1, 5]
 
     dic_sparse_W_out = {}
-    dic_sparse_AIC = {}
+    dic_sparse_AIC = {}        
+    dic_sparse_MSE = {}
+    dic_sparse_pinv = {}
 
     for initial_theta in grid_initial_theta:
 
@@ -119,7 +122,7 @@ for rand_seed in range(100):
             # compute the pseudo-inverse matrix error
 
             pinv_error_matrix = np.linalg.pinv(out_train[:,:] @ out_train[:,:].T) @ (out_train[:,:] @ out_train[:,:].T) - np.identity(out_train.shape[0])
-            pinv_error = np.sum(pinv_error_matrix**2) / out_train.shape[0]**2
+            pinv_error = np.sum(pinv_error_matrix**2)# / out_train.shape[0]**2
                 
             ##
             ## SINDy
@@ -239,8 +242,9 @@ for rand_seed in range(100):
             if np.isnan(AIC_sparse):
                 AIC_sparse = 1e5
 
-
             dic_sparse_AIC['({},{})'.format(initial_theta,delta_theta)] = AIC_sparse
+            dic_sparse_MSE['({},{})'.format(initial_theta,delta_theta)] = sparse_MSE
+            dic_sparse_pinv['({},{})'.format(initial_theta,delta_theta)] = pinv_error
 
     #####################################################################################
 
@@ -250,69 +254,19 @@ for rand_seed in range(100):
     W_out = dic_sparse_W_out[min_key]
 
     best_initial_theta, best_delta_theta = min_key.strip('()').split(',')
-
-    best_initial_theta = float(best_initial_theta)
-    best_delta_theta = float(best_delta_theta)
+    
+    sparse_MSE = dic_sparse_MSE['({},{})'.format(best_initial_theta,best_delta_theta)]
+    pinv_error = dic_sparse_pinv['({},{})'.format(best_initial_theta,best_delta_theta)]
 
     #####################################################################################
 
-    theta = np.linspace(best_initial_theta, best_initial_theta + (length - 1) * best_delta_theta, length)
-
-    theta = theta.reshape(-1,1)
-
-    x_theta_tseries = np.hstack((data_tseries, theta))
-
-    theta_train = theta[:train_length+1]
-
-    # create an array to hold the linear part of the feature vector
-    x_train = np.zeros((dlin,train_length*N))
-    y_train = np.zeros((d,train_length*N))
-
-    out_train = np.ones((dtot + cte,train_length*N))
-
-    for node in range(N):
-
-        self_var_index = [node] 
-        inter_var_index = list(np.where(data_network[:,node] == 1)[0])
-
-        si_var_index = self_var_index + inter_var_index
-
-        node_data = data_tseries[:,si_var_index][:train_length+1]
-
-        # input number of interactive node
-        k = len(si_var_index)
-
-        node_data_theta = np.hstack((node_data, theta_train))
-
-        # fill in the linear part of the feature vector for all times
-        for j in range(train_length):
-
-            x_train[:d,train_length*node+j] = node_data_theta[j][:d]
-            x_train[d:d+d_theta,train_length*node+j] = node_data_theta[j][-1]
-            x_train[d+d_theta:,train_length*node+j] = np.sum(np.sin(node_data_theta[j][d:k*d]-np.tile(node_data_theta[j][:d],k-1)))
-        
-        # copy over the linear part (shift over by one to account for constant if needed)
-        out_train[cte:dlin + cte, node*train_length : (node+1)*train_length] = x_train[:, node*train_length : (node+1)*train_length]
-
-        y_train[0,train_length*node : train_length*(node+1)] = (node_data_theta[1:train_length+1,0] - node_data_theta[:train_length,0]).T/dt
-
-    # fill in the non-linear part, order = 2
-    cnt = 0
-    for row1 in range(dlin):
-        for row2 in range(row1,dlin):
-            # shift by one for constant if needed
-            out_train[dlin + cnt + cte] = x_train[row1,:] * x_train[row2,:]
-            cnt += 1           
-    
-    # compute the pseudo-inverse matrix error
-
-    pinv_error_matrix = np.linalg.pinv(out_train[:,:] @ out_train[:,:].T) @ (out_train[:,:] @ out_train[:,:].T) - np.identity(out_train.shape[0])
-    pinv_error = np.sum(pinv_error_matrix**2) / out_train.shape[0]**2
-
+    MSE_list.append(sparse_MSE)
     pinv_error_list.append(pinv_error)
 
+mean_MSE = np.mean(MSE_list)
 mean_pinv_error = np.mean(pinv_error_list)
 
+print('eAIC MSE: {}'.format(mean_MSE))
 print('eAIC pinv error: {}'.format(mean_pinv_error))
 
 

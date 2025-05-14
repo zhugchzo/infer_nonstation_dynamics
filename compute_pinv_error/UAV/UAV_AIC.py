@@ -43,6 +43,8 @@ dic_sparse_W_out = {}
 dic_ridge_W_out = {}
 dic_sparse_AIC = {}
 dic_ridge_AIC = {}
+dic_sparse_MSE = {}
+dic_ridge_MSE = {}
 
 for initial_theta in grid_initial_theta:
 
@@ -236,6 +238,8 @@ for initial_theta in grid_initial_theta:
 
         dic_sparse_AIC['({},{})'.format(initial_theta,delta_theta)] = AIC_sparse
         dic_ridge_AIC['({},{})'.format(initial_theta,delta_theta)] = AIC_ridge
+        dic_sparse_MSE['({},{})'.format(initial_theta,delta_theta)] = sparse_MSE
+        dic_ridge_MSE['({},{})'.format(initial_theta,delta_theta)] = ridge_MSE
 
 #####################################################################################
 
@@ -245,11 +249,13 @@ min_key_ridge = min(dic_ridge_AIC, key=dic_ridge_AIC.get)
 if dic_sparse_AIC[min_key_sparse] < dic_ridge_AIC[min_key_ridge]:
     min_key = min_key_sparse
     W_out = dic_sparse_W_out[min_key]
+    MSE = dic_sparse_MSE[min_key]
 
     print('best virtual forcing parameter and regression is SINDy:{}'.format(min_key))
 else:
     min_key = min_key_ridge
     W_out = dic_ridge_W_out[min_key]
+    MSE = dic_ridge_MSE[min_key]
 
     print('best virtual forcing parameter and regression is Ridge:{}'.format(min_key))
 
@@ -300,4 +306,5 @@ for row1 in range(dlin):
 pinv_error_matrix = np.linalg.pinv(out_train[:,:] @ out_train[:,:].T + ridge_param*np.identity(dtot+ cte)) @ (out_train[:,:] @ out_train[:,:].T + ridge_param*np.identity(dtot+ cte)) - np.identity(out_train.shape[0])
 pinv_error = np.sum(pinv_error_matrix**2) / out_train.shape[0]**2
 
+print('AIC MSE: {}'.format(MSE))
 print('AIC pinv error: {}'.format(pinv_error))

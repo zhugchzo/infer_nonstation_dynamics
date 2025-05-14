@@ -172,14 +172,33 @@ theta_train = theta_train.reshape(-1, 1)
 
 #####################################################################################
 
+sparse_node_dictionary_list = list()
+ridge_node_dictionary_list = list()
+
 pinv_error = 0
 
+sparse_MSE = 0
+ridge_MSE = 0
+
+sparse_nozero = 0
+ridge_nozero = 0
+
+sparse_p_zero_count = 0
+sparse_self_zero_count = 0
+sparse_inter_zero_count = 0
+
 for node in range(N):
+
+    node_dictionary_sparse = {}
+    node_dictionary_ridge = {}
     
     self_var_index = list(np.where(data_network[:,node] == 2)[0])
     inter_var_index = list(np.where(data_network[:,node] == 1)[0])
 
     si_var_index = self_var_index + inter_var_index
+
+    node_dictionary_sparse['si_var_index'] = si_var_index
+    node_dictionary_ridge['si_var_index'] = si_var_index
 
     node_data = data_tseries[:,si_var_index][:train_length+1]
 
@@ -287,4 +306,391 @@ for node in range(N):
 
     pinv_error += node_pinv_error / N
 
+    ##
+    ## SINDy
+    ##
+    
+    W_out_sparse = x_train[0:d,1:train_length + 1] @ out_train[:,:].T @ np.linalg.pinv(out_train[:,:] @ out_train[:,:].T)
+
+    # Set the sparsification parameter lambda
+    # Adjustable parameter, modify according to your data
+    if node in [1]:
+        lambda_param = 0.02
+    else:
+        lambda_param = 0.1
+
+    # Perform sparsification, iterate multiple times to obtain a sparse solution
+    for k in range(10):  # Number of iterations, can be adjusted as needed
+        # Find the coefficients smaller than lambda_param and set them to zero
+        smallinds = (np.abs(W_out_sparse) < lambda_param)
+        W_out_sparse[smallinds] = 0
+        
+        # For each state dimension, perform least-squares regression again, only keeping the large coefficients
+        for ind in range(d):  # Iterate over each state dimension
+            biginds = ~smallinds[ind, :]  # Indices of large coefficients
+            # Perform regression using only the non-zero coefficients
+            W_out_sparse[ind, biginds] = x_train[ind,1:train_length + 1] @ out_train[biginds,:].T @ np.linalg.pinv(out_train[biginds,:] @ out_train[biginds,:].T)
+
+    node_dictionary_sparse['W_out'] = W_out_sparse[0]
+    sparse_nozero += np.count_nonzero(W_out_sparse[0])
+
+    sparse_node_dictionary_list.append(node_dictionary_sparse)
+
+    ##
+    ## Ridge
+    ##
+    
+    ridge_param = 1e-5
+
+    W_out_ridge = x_train[0:d,1:train_length + 1] @ out_train[:,:].T @ np.linalg.pinv(out_train[:,:] @ out_train[:,:].T + ridge_param*np.identity(dtot+ cte))
+
+    node_dictionary_ridge['W_out'] = W_out_ridge[0]
+    ridge_nozero += np.count_nonzero(W_out_ridge[0])
+
+    ridge_node_dictionary_list.append(node_dictionary_ridge)
+    
+    p_indexes = [i for i, item in enumerate(f_library) if 'p' in item]
+    if np.sum(W_out_sparse[0][p_indexes]) == 0:
+        sparse_p_zero_count += 1
+
+    if node in [0,2,3,8,10,11]:
+        self_var_name = ['x_1','x_1^2','x_1*p','x_1*y_1','x_1*x_1*x_1','x_1*x_1*p','x_1*p*p','y_1*x_1*x_1','y_1*p*x_1','x_1*y_1*y_1']
+        self_indexes = [i for i, item in enumerate(f_library) if item in self_var_name]
+        if self_indexes and np.sum(W_out_sparse[0][self_indexes]) == 0:
+            sparse_self_zero_count += 1                
+
+    else:
+        self_var_name = ['x_1', 'x_1^2', 'x_1*p', 'x_1*y_1', 'x_1*y_2', 'x_1*x_1*x_1', 'x_1*x_1*p', 'x_1*p*p', 'y_1*x_1*x_1', 'y_1*p*x_1', 'y_2*x_1*x_1', 'y_2*p*x_1', 'x_1*y_1*y_1', 'x_1*y_1*y_2', 'x_1*y_2*y_2']
+        inter_var_name = ['y_{}'.format(3+i) for i in range(int(2*len(inter_var_index)))]
+        self_indexes = [i for i, item in enumerate(f_library) if item in self_var_name]
+        if self_indexes and np.sum(W_out_sparse[0][self_indexes]) == 0:
+            sparse_self_zero_count += 1   
+
+    if node in [2,10]:
+        inter_var_name = ['y_{}'.format(2+i) for i in range(int(3*len(inter_var_index)))]
+        inter_indexes = [i for i, item in enumerate(f_library) if any(name in item for name in inter_var_name)]
+        if inter_indexes and np.sum(W_out_sparse[0][inter_indexes]) == 0:
+            sparse_inter_zero_count += 1
+    
+    elif node in [4,5,9,12,13]:
+        inter_var_name = ['y_{}'.format(3+i) for i in range(int(2*len(inter_var_index)))]
+        inter_indexes = [i for i, item in enumerate(f_library) if any(name in item for name in inter_var_name)]
+        if inter_indexes and np.sum(W_out_sparse[0][inter_indexes]) == 0:
+            sparse_inter_zero_count += 1
+    
+    elif node in [0]:
+        inter_var_name = ['y_{}'.format(2+i) for i in range(int(2*len(inter_var_index)))]
+        inter_indexes = [i for i, item in enumerate(f_library) if any(name in item for name in inter_var_name)]
+        if inter_indexes and np.sum(W_out_sparse[0][inter_indexes]) == 0:
+            sparse_inter_zero_count += 1
+
+    elif node in [3,8,11]:
+        inter_var_name = ['y_{}'.format(2+i) for i in range(int(2*len(inter_var_index)))]
+        inter_indexes = [i for i, item in enumerate(f_library) if any(name in item for name in inter_var_name)]
+        if inter_indexes and np.sum(W_out_sparse[0][inter_indexes]) == 0:
+            sparse_inter_zero_count += 1
+
+    else:
+        inter_var_name = ['y_{}'.format(3+i) for i in range(int(3*len(inter_var_index)))]
+        inter_indexes = [i for i, item in enumerate(f_library) if any(name in item for name in inter_var_name)]
+        if inter_indexes and np.sum(W_out_sparse[0][inter_indexes]) == 0:
+            sparse_inter_zero_count += 1
+    
+    # confirm virtual forcing parameter in governing equations
+    if sparse_p_zero_count == N:
+        sparse_MSE = np.nan
+    
+    # confirm self dynamics in governing equations
+    if sparse_self_zero_count > 1:
+        sparse_MSE = np.nan
+    
+    # confirm interaction dynamics in governing equations
+    if sparse_inter_zero_count > 1:
+        sparse_MSE = np.nan
+    
+        # confirm there is no governing equation being zero
+    if np.sum(W_out_sparse[0]) == 0:
+        sparse_MSE = np.nan
+
+#####################################################################################
+
+# compute MSE
+
+next_x_train = data_tseries[1:train_length+1]
+MSE_x_train = data_tseries[0:train_length]
+
+splits = np.split(MSE_x_train, indices_or_sections=np.arange(period, MSE_x_train.shape[0], period), axis=0)
+
+# SINDy
+
+sparse_valid_matrix = np.zeros((N+d_theta,train_length+1))  # linear part
+sparse_valid_matrix[N+d_theta-1,:] = theta_valid
+
+MSE_index = 0
+
+for one_period in splits:
+
+    period_test_length = len(one_period)
+
+    sparse_valid_matrix[:N+d_theta-1,0] = one_period[0,:]
+
+    # do validation
+    for j in range(period_test_length):
+
+        for node in range(N):
+
+            node_dictionary = sparse_node_dictionary_list[node]
+
+            si_var_index = node_dictionary['si_var_index']
+            W_out = node_dictionary['W_out']
+
+            # input number of interactive node
+            k = len(si_var_index)
+            # size of linear part of feature vector (x1,...,xn,b)
+            dlin = d + d_theta
+
+            if node in [2,10]:
+                dcop = (3*k-2)*d
+
+            elif node in [4,5,9,12,13]:
+                dcop = 2*k*d  
+
+            elif node in [0,3,8,11]:
+                dcop = (2*k-1)*d
+
+            else:
+                dcop = (3*k-1)*d
+            
+            # size of nonlinear part of feature vector
+            dnonlin_2 = int(((dlin + 1)*dlin/2) + (d*dcop))
+            dnonlin_3 = int(((dlin + 2)*(dlin + 1)*dlin/6) + (((dlin + 1)*dlin/2-1)*dcop) + (((dcop + 1)*dcop/2)*d))
+            dnonlin = dnonlin_2 + dnonlin_3
+            # total size of feature vector: linear + nonlinear
+            dtot = dlin + dnonlin
+
+            # create a place to store feature vectors for prediction
+            sparse_out_valid = np.ones((dtot + cte,1))  # full feature vector
+            
+            var_index = si_var_index.copy()
+            var_index.append(N+d_theta-1)
+            
+            sparse_x_valid = np.zeros(dlin + dcop)
+
+            if node in [2,10]:
+                sparse_x_valid[:d] = sparse_valid_matrix[var_index,j][:d]
+                sparse_x_valid[d:2*d] = 1/(a+sparse_valid_matrix[var_index,j][:d])
+                sparse_x_valid[2*d:(1+k)*d] = sparse_valid_matrix[var_index,j][d:k*d]
+                sparse_x_valid[(1+k)*d:(2*k)*d] = 1/(a+sparse_valid_matrix[var_index,j][d:k*d])
+                sparse_x_valid[(2*k)*d:(3*k-1)*d] = 1/(b+np.exp(-sparse_valid_matrix[var_index,j][d:k*d]+np.tile(sparse_valid_matrix[var_index,j][:d],k-1)))
+                sparse_x_valid[-1] = sparse_valid_matrix[var_index,j][-1]
+
+            elif node in [4,5,9,12,13]:
+                sparse_x_valid[:d] = sparse_valid_matrix[var_index,j][:d]
+                sparse_x_valid[d:2*d] = 1/(a+sparse_valid_matrix[var_index,j][:d])
+                sparse_x_valid[2*d:3*d] = 1/(b+np.exp(-sparse_valid_matrix[var_index,j][:d]))
+                sparse_x_valid[3*d:(k+2)*d] = sparse_valid_matrix[var_index,j][d:k*d]
+                sparse_x_valid[(k+2)*d:(2*k+1)*d] = 1/(b+np.exp(-sparse_valid_matrix[var_index,j][d:k*d]+np.tile(sparse_valid_matrix[var_index,j][:d],k-1)))
+                sparse_x_valid[-1] = sparse_valid_matrix[var_index,j][-1]
+
+            elif node in [0]:
+                sparse_x_valid[:d] = sparse_valid_matrix[var_index,j][:d]
+                sparse_x_valid[d:2*d] = 1/(b+np.exp(-sparse_valid_matrix[var_index,j][:d]))
+                sparse_x_valid[2*d:(1+k)*d] = sparse_valid_matrix[var_index,j][d:k*d]
+                sparse_x_valid[(1+k)*d:2*k*d] = 1/(a+sparse_valid_matrix[var_index,j][d:k*d])
+                sparse_x_valid[-1] = sparse_valid_matrix[var_index,j][-1]
+
+            elif node in [3,8,11]:
+                sparse_x_valid[:d] = sparse_valid_matrix[var_index,j][:d]
+                sparse_x_valid[d:2*d] = 1/(b+np.exp(-sparse_valid_matrix[var_index,j][:d]))
+                sparse_x_valid[2*d:(1+k)*d] = sparse_valid_matrix[var_index,j][d:k*d]
+                sparse_x_valid[(1+k)*d:2*k*d] = 1/(b+np.exp(-sparse_valid_matrix[var_index,j][d:k*d]+np.tile(sparse_valid_matrix[var_index,j][:d],k-1)))
+                sparse_x_valid[-1] = sparse_valid_matrix[var_index,j][-1]
+            
+            else:
+                sparse_x_valid[:d] = sparse_valid_matrix[var_index,j][:d]
+                sparse_x_valid[d:2*d] = 1/(a+sparse_valid_matrix[var_index,j][:d])
+                sparse_x_valid[2*d:3*d] = 1/(b+np.exp(-sparse_valid_matrix[var_index,j][:d]))
+                sparse_x_valid[3*d:(2+k)*d] = sparse_valid_matrix[var_index,j][d:k*d]
+                sparse_x_valid[(2+k)*d:(2*k+1)*d] = 1/(a+sparse_valid_matrix[var_index,j][d:k*d])
+                sparse_x_valid[(2*k+1)*d:(3*k)*d] = 1/(b+np.exp(-sparse_valid_matrix[var_index,j][d:k*d]+np.tile(sparse_valid_matrix[var_index,j][:d],k-1)))
+                sparse_x_valid[-1] = sparse_valid_matrix[var_index,j][-1]
+
+            sparse_x_valid = sparse_x_valid.reshape(-1,1)
+
+            if node in [2,10]:
+                sparse_out_valid[cte:dlin + cte] = generate_dynamic_function(sparse_x_valid, d, k, 2)[0]
+                sparse_out_valid[dlin + cte : dlin + dnonlin_2 + cte, :] = generate_dynamic_function(sparse_x_valid, d, k, 2)[1]
+                sparse_out_valid[dlin + cte + dnonlin_2:, :] = generate_dynamic_function(sparse_x_valid, d, k, 2)[2]
+
+            elif node in [4,5,9,12,13]:
+                sparse_out_valid[cte:dlin + cte] = generate_dynamic_function(sparse_x_valid, d, k, 3)[0]
+                sparse_out_valid[dlin + cte : dlin + dnonlin_2 + cte, :] = generate_dynamic_function(sparse_x_valid, d, k, 3)[1]
+                sparse_out_valid[dlin + cte + dnonlin_2:, :] = generate_dynamic_function(sparse_x_valid, d, k, 3)[2]
+            
+            elif node in [0,3,8,11]:
+                sparse_out_valid[cte:dlin + cte] = generate_dynamic_function(sparse_x_valid, d, k, 4)[0]
+                sparse_out_valid[dlin + cte : dlin + dnonlin_2 + cte, :] = generate_dynamic_function(sparse_x_valid, d, k, 4)[1]
+                sparse_out_valid[dlin + cte + dnonlin_2:, :] = generate_dynamic_function(sparse_x_valid, d, k, 4)[2]           
+            
+            else:
+                sparse_out_valid[cte:dlin + cte] = generate_dynamic_function(sparse_x_valid, d, k, 1)[0]
+                sparse_out_valid[dlin + cte : dlin + dnonlin_2 + cte, :] = generate_dynamic_function(sparse_x_valid, d, k, 1)[1]
+                sparse_out_valid[dlin + cte + dnonlin_2:, :] = generate_dynamic_function(sparse_x_valid, d, k, 1)[2]
+
+            prediction = (W_out @ sparse_out_valid[:])[0]
+
+            if prediction < 0:
+                prediction = 0
+
+            sparse_valid_matrix[node,MSE_index+j+1] = prediction
+    
+    MSE_index += period_test_length
+
+mse_sparse = (next_x_train - sparse_valid_matrix[:N+d_theta-1,1:].T)**2
+mse_sparse_normalized = (mse_sparse - np.min(mse_sparse, axis=0)) / (np.max(mse_sparse, axis=0) - np.min(mse_sparse, axis=0))
+
+column_sums_sparse = np.sum(mse_sparse_normalized, axis=1)
+
+sparse_MSE += np.mean(column_sums_sparse)
+
+# Ridge
+
+ridge_valid_matrix = np.zeros((N+d_theta,train_length+1))  # linear part
+ridge_valid_matrix[N+d_theta-1,:] = theta_valid
+
+MSE_index = 0
+
+for one_period in splits:
+
+    period_test_length = len(one_period)
+
+    ridge_valid_matrix[:N+d_theta-1,0] = one_period[0,:]
+
+    # do validation
+    for j in range(period_test_length):
+
+        for node in range(N):
+
+            node_dictionary = ridge_node_dictionary_list[node]
+
+            si_var_index = node_dictionary['si_var_index']
+            W_out = node_dictionary['W_out']
+
+            # input number of interactive node
+            k = len(si_var_index)
+            # size of linear part of feature vector (x1,...,xn,b)
+            dlin = d + d_theta
+
+            if node in [2,10]:
+                dcop = (3*k-2)*d
+
+            elif node in [4,5,9,12,13]:
+                dcop = 2*k*d  
+
+            elif node in [0,3,8,11]:
+                dcop = (2*k-1)*d
+
+            else:
+                dcop = (3*k-1)*d
+            
+            # size of nonlinear part of feature vector
+            dnonlin_2 = int(((dlin + 1)*dlin/2) + (d*dcop))
+            dnonlin_3 = int(((dlin + 2)*(dlin + 1)*dlin/6) + (((dlin + 1)*dlin/2-1)*dcop) + (((dcop + 1)*dcop/2)*d))
+            dnonlin = dnonlin_2 + dnonlin_3
+            # total size of feature vector: linear + nonlinear
+            dtot = dlin + dnonlin
+
+            # create a place to store feature vectors for prediction
+            ridge_out_valid = np.ones((dtot + cte,1))  # full feature vector
+            
+            var_index = si_var_index.copy()
+            var_index.append(N+d_theta-1)
+            
+            ridge_x_valid = np.zeros(dlin + dcop)
+
+            if node in [2,10]:
+                ridge_x_valid[:d] = ridge_valid_matrix[var_index,j][:d]
+                ridge_x_valid[d:2*d] = 1/(a+ridge_valid_matrix[var_index,j][:d])
+                ridge_x_valid[2*d:(1+k)*d] = ridge_valid_matrix[var_index,j][d:k*d]
+                ridge_x_valid[(1+k)*d:(2*k)*d] = 1/(a+ridge_valid_matrix[var_index,j][d:k*d])
+                ridge_x_valid[(2*k)*d:(3*k-1)*d] = 1/(b+np.exp(-ridge_valid_matrix[var_index,j][d:k*d]+np.tile(ridge_valid_matrix[var_index,j][:d],k-1)))
+                ridge_x_valid[-1] = ridge_valid_matrix[var_index,j][-1]
+
+            elif node in [4,5,9,12,13]:
+                ridge_x_valid[:d] = ridge_valid_matrix[var_index,j][:d]
+                ridge_x_valid[d:2*d] = 1/(a+ridge_valid_matrix[var_index,j][:d])
+                ridge_x_valid[2*d:3*d] = 1/(b+np.exp(-ridge_valid_matrix[var_index,j][:d]))
+                ridge_x_valid[3*d:(k+2)*d] = ridge_valid_matrix[var_index,j][d:k*d]
+                ridge_x_valid[(k+2)*d:(2*k+1)*d] = 1/(b+np.exp(-ridge_valid_matrix[var_index,j][d:k*d]+np.tile(ridge_valid_matrix[var_index,j][:d],k-1)))
+                ridge_x_valid[-1] = ridge_valid_matrix[var_index,j][-1]
+
+            elif node in [0]:
+                ridge_x_valid[:d] = ridge_valid_matrix[var_index,j][:d]
+                ridge_x_valid[d:2*d] = 1/(b+np.exp(-ridge_valid_matrix[var_index,j][:d]))
+                ridge_x_valid[2*d:(1+k)*d] = ridge_valid_matrix[var_index,j][d:k*d]
+                ridge_x_valid[(1+k)*d:2*k*d] = 1/(a+ridge_valid_matrix[var_index,j][d:k*d])
+                ridge_x_valid[-1] = ridge_valid_matrix[var_index,j][-1]
+
+            elif node in [3,8,11]:
+                ridge_x_valid[:d] = ridge_valid_matrix[var_index,j][:d]
+                ridge_x_valid[d:2*d] = 1/(b+np.exp(-ridge_valid_matrix[var_index,j][:d]))
+                ridge_x_valid[2*d:(1+k)*d] = ridge_valid_matrix[var_index,j][d:k*d]
+                ridge_x_valid[(1+k)*d:2*k*d] = 1/(b+np.exp(-ridge_valid_matrix[var_index,j][d:k*d]+np.tile(ridge_valid_matrix[var_index,j][:d],k-1)))
+                ridge_x_valid[-1] = ridge_valid_matrix[var_index,j][-1]
+            
+            else:
+                ridge_x_valid[:d] = ridge_valid_matrix[var_index,j][:d]
+                ridge_x_valid[d:2*d] = 1/(a+ridge_valid_matrix[var_index,j][:d])
+                ridge_x_valid[2*d:3*d] = 1/(b+np.exp(-ridge_valid_matrix[var_index,j][:d]))
+                ridge_x_valid[3*d:(2+k)*d] = ridge_valid_matrix[var_index,j][d:k*d]
+                ridge_x_valid[(2+k)*d:(2*k+1)*d] = 1/(a+ridge_valid_matrix[var_index,j][d:k*d])
+                ridge_x_valid[(2*k+1)*d:(3*k)*d] = 1/(b+np.exp(-ridge_valid_matrix[var_index,j][d:k*d]+np.tile(ridge_valid_matrix[var_index,j][:d],k-1)))
+                ridge_x_valid[-1] = ridge_valid_matrix[var_index,j][-1]
+
+            ridge_x_valid = ridge_x_valid.reshape(-1,1)
+
+            if node in [2,10]:
+                ridge_out_valid[cte:dlin + cte] = generate_dynamic_function(ridge_x_valid, d, k, 2)[0]
+                ridge_out_valid[dlin + cte : dlin + dnonlin_2 + cte, :] = generate_dynamic_function(ridge_x_valid, d, k, 2)[1]
+                ridge_out_valid[dlin + cte + dnonlin_2:, :] = generate_dynamic_function(ridge_x_valid, d, k, 2)[2]
+
+            elif node in [4,5,9,12,13]:
+                ridge_out_valid[cte:dlin + cte] = generate_dynamic_function(ridge_x_valid, d, k, 3)[0]
+                ridge_out_valid[dlin + cte : dlin + dnonlin_2 + cte, :] = generate_dynamic_function(ridge_x_valid, d, k, 3)[1]
+                ridge_out_valid[dlin + cte + dnonlin_2:, :] = generate_dynamic_function(ridge_x_valid, d, k, 3)[2]
+            
+            elif node in [0,3,8,11]:
+                ridge_out_valid[cte:dlin + cte] = generate_dynamic_function(ridge_x_valid, d, k, 4)[0]
+                ridge_out_valid[dlin + cte : dlin + dnonlin_2 + cte, :] = generate_dynamic_function(ridge_x_valid, d, k, 4)[1]
+                ridge_out_valid[dlin + cte + dnonlin_2:, :] = generate_dynamic_function(ridge_x_valid, d, k, 4)[2]         
+            
+            else:
+                ridge_out_valid[cte:dlin + cte] = generate_dynamic_function(ridge_x_valid, d, k, 1)[0]
+                ridge_out_valid[dlin + cte : dlin + dnonlin_2 + cte, :] = generate_dynamic_function(ridge_x_valid, d, k, 1)[1]
+                ridge_out_valid[dlin + cte + dnonlin_2:, :] = generate_dynamic_function(ridge_x_valid, d, k, 1)[2]
+
+            prediction = (W_out @ ridge_out_valid[:])[0]
+
+            if prediction < 0:
+                prediction = 0
+
+            ridge_valid_matrix[node,MSE_index+j+1] = prediction
+    
+    MSE_index += period_test_length
+
+mse_ridge = (next_x_train - ridge_valid_matrix[:N+d_theta-1,1:].T)**2
+mse_ridge_normalized = (mse_ridge - np.min(mse_ridge, axis=0)) / (np.max(mse_ridge, axis=0) - np.min(mse_ridge, axis=0))
+
+column_sums_ridge = np.sum(mse_ridge_normalized, axis=1)
+
+ridge_MSE += np.mean(column_sums_ridge)
+
+#####################################################################################
+
+if sparse_MSE < ridge_MSE:
+    MSE = sparse_MSE
+else:
+    MSE = ridge_MSE
+
+print('forcing parameters MSE: {}'.format(MSE))
 print('forcing parameters pinv error: {}'.format(pinv_error))

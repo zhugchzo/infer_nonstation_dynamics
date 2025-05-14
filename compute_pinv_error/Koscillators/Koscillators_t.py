@@ -26,13 +26,14 @@ col_x = ['x0', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7', 'x8', 'x9', 'x10']
 # the number of node
 N = len(col_x)
 
+MSE_list = list()
 pinv_error_list = list()
 
 for rand_seed in range(100):
 
     # Load the saved data
-    df_tseries = pd.read_csv('../../Koscillators/robust/Koscillators_data/Koscillators_data_{}.csv'.format(rand_seed))
-    df_network = pd.read_csv('../../Koscillators/robust/Koscillators_data/Koscillators_network_{}.csv'.format(rand_seed),header=None)
+    df_tseries = pd.read_csv('../../Koscillators/Koscillators_data/Koscillators_data_{}.csv'.format(rand_seed))
+    df_network = pd.read_csv('../../Koscillators/Koscillators_data/Koscillators_network_{}.csv'.format(rand_seed),header=None)
 
     data_network = df_network.values
 
@@ -100,10 +101,95 @@ for rand_seed in range(100):
     # compute the pseudo-inverse matrix error
 
     pinv_error_matrix = np.linalg.pinv(out_train[:,:] @ out_train[:,:].T) @ (out_train[:,:] @ out_train[:,:].T) - np.identity(out_train.shape[0])
-    pinv_error = np.sum(pinv_error_matrix**2) / out_train.shape[0]**2
+    pinv_error = np.sum(pinv_error_matrix**2)# / out_train.shape[0]**2
 
+    ##
+    ## SINDy
+    ##
+    
+    W_out_sparse = y_train @ out_train[:,:].T @ np.linalg.pinv(out_train[:,:] @ out_train[:,:].T)
+
+    # Set the sparsification parameter lambda
+    # Adjustable parameter, modify according to your data
+    lambda_param = 1e-2
+
+    # Perform sparsification, iterate multiple times to obtain a sparse solution
+    for k in range(10):  # Number of iterations, can be adjusted as needed
+        # Find the coefficients smaller than lambda_param and set them to zero
+        smallinds = (np.abs(W_out_sparse) < lambda_param)
+        W_out_sparse[smallinds] = 0
+        
+        # For each state dimension, perform least-squares regression again, only keeping the large coefficients
+        for ind in range(d):  # Iterate over each state dimension
+            biginds = ~smallinds[ind,:]  # Indices of large coefficients
+            # Perform regression using only the non-zero coefficients
+            W_out_sparse[ind, biginds] = y_train[ind,:] @ out_train[biginds,:].T @ np.linalg.pinv(out_train[biginds,:] @ out_train[biginds,:].T)
+
+#####################################################################################
+
+    # generation, compute MSE, SINDy
+
+    # create a place to store feature vectors for prediction
+    out_gen_sparse = np.ones((dtot + cte,N))        # full feature vector
+    x_gen_sparse = np.zeros((dlin,train_length*N))      # linear part
+
+    x_gen_sparse[d:d+d_theta,:] = np.tile(xt_tseries[:train_length, -1], N)
+
+    gen_traj_sparse = np.zeros((N,train_length))
+
+    for node in range(N):
+
+        inter_var_index = list(np.where(data_network[:,node] == 1)[0])
+
+        k = len(inter_var_index)
+        
+        # copy over initial linear feature vector
+        x_gen_sparse[0,train_length*node] = xt_tseries[0,node]
+        x_gen_sparse[d+d_theta:,train_length*node] = np.sum(np.sin(xt_tseries[0,inter_var_index]-np.tile(xt_tseries[0,node],k)))
+
+        gen_traj_sparse[node,0] = x_gen_sparse[0,train_length*node]
+
+    for j in range(train_length-1):
+
+        for node in range(N):
+
+            # copy linear part into whole feature vector
+            out_gen_sparse[cte:dlin + cte,node] = x_gen_sparse[:,train_length*node+j] # shift by one for constant
+
+            # fill in the non-linear part
+
+            cnt = 0
+            # 2-order
+            for row1 in range(dlin):
+                for row2 in range(row1,dlin):
+                    # shift by one for constant
+                    out_gen_sparse[dlin + cnt + cte,node] = x_gen_sparse[row1,train_length*node+j] * x_gen_sparse[row2,train_length*node+j]
+                    cnt += 1
+
+            # do a prediction
+            x_gen_sparse[0,train_length*node+j+1] = x_gen_sparse[0,train_length*node+j] + (W_out_sparse[0] @ out_gen_sparse[:,node])*dt
+
+            gen_traj_sparse[node,j+1] = x_gen_sparse[0,train_length*node+j+1]
+
+        for node in range(N):
+
+            inter_var_index = np.where(data_network[:,node] == 1)[0]
+            k = len(inter_var_index)
+
+            inter_var = x_gen_sparse[0,train_length*inter_var_index+j+1]
+
+            x_gen_sparse[d+d_theta:,train_length*node+j+1] = np.sum(np.sin(inter_var-np.tile(x_gen_sparse[0,train_length*node+j+1],k)))
+
+    mse_sparse = (train_x_tseries - gen_traj_sparse)**2
+
+    sums_sparse = np.sum(mse_sparse)
+    sparse_MSE = sums_sparse / train_length
+
+    MSE_list.append(sparse_MSE)
     pinv_error_list.append(pinv_error)
 
+mean_MSE = np.mean(MSE_list)
 mean_pinv_error = np.mean(pinv_error_list)
 
+print('time MSE: {}'.format(mean_MSE))
 print('time pinv error: {}'.format(mean_pinv_error))

@@ -24,6 +24,9 @@ def recov_fun(x,b):
     rrate = b - 3*x**2
     return rrate
 
+initial_value_list = list()
+bif_time_list = list()
+
 # Model parameters
 ah = 3
 bh = 3
@@ -75,4 +78,15 @@ for al in [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2]:
 
         cols = ['Time'] + [col for col in df_data.columns if col != 'Time']
 
+        mask = df_data['rrate'] > 0
+        bif_time = df_data.loc[mask, 'Time'].iloc[0]
+
         df_data.to_csv('cusp_data/cusp_data_{}_{}.csv'.format(al,bl),index=False)
+
+        initial_value_list.append('{},{}'.format(al,bl))
+        bif_time_list.append(bif_time)
+
+bif_dic = {'initial_value':initial_value_list, 'bif_time':bif_time_list}
+df_bif = pd.DataFrame(bif_dic)
+
+df_bif.to_csv('cusp_data/bif.csv',index=False)

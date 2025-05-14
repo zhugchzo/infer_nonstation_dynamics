@@ -41,6 +41,9 @@ dic_sparse_W_out = {}
 dic_ridge_W_out = {}
 dic_sparse_AIC = {}
 dic_ridge_AIC = {}
+dic_sparse_MSE = {}
+dic_ridge_MSE = {}
+dic_pinv = {}
 
 for initial_theta in grid_initial_theta:
 
@@ -243,6 +246,9 @@ for initial_theta in grid_initial_theta:
 
         dic_sparse_AIC['({},{})'.format(initial_theta,delta_theta)] = AIC_sparse
         dic_ridge_AIC['({},{})'.format(initial_theta,delta_theta)] = AIC_ridge
+        dic_sparse_MSE['({},{})'.format(initial_theta,delta_theta)] = sparse_MSE
+        dic_ridge_MSE['({},{})'.format(initial_theta,delta_theta)] = ridge_MSE
+        dic_pinv['({},{})'.format(initial_theta,delta_theta)] = pinv_error
 
 #####################################################################################
 
@@ -252,60 +258,21 @@ min_key_ridge = min(dic_ridge_AIC, key=dic_ridge_AIC.get)
 if dic_sparse_AIC[min_key_sparse] < dic_ridge_AIC[min_key_ridge]:
     min_key = min_key_sparse
     W_out = dic_sparse_W_out[min_key]
+    MSE = dic_sparse_MSE[min_key]
 
     print('best virtual forcing parameter and regression is SINDy:{}'.format(min_key))
 else:
     min_key = min_key_ridge
     W_out = dic_ridge_W_out[min_key]
+    MSE = dic_ridge_MSE[min_key]
 
     print('best virtual forcing parameter and regression is Ridge:{}'.format(min_key))
 
 best_initial_theta, best_delta_theta = min_key.strip('()').split(',')
 
-best_initial_theta = float(best_initial_theta)
-best_delta_theta = float(best_delta_theta)
+pinv_error = dic_pinv['({},{})'.format(best_initial_theta,best_delta_theta)]
 
 #####################################################################################
 
-theta = np.linspace(best_initial_theta, best_initial_theta + (length - 1) * best_delta_theta, length)
-
-x_tseries = x_tseries.reshape(-1, 1)
-theta = theta.reshape(-1, 1)
-
-x_theta_tseries = np.hstack((x_tseries, theta))
-
-# create an array to hold the linear part of the feature vector
-x_train = np.zeros((dlin,train_length + 1))
-
-# fill in the linear part of the feature vector for all times
-for j in range(train_length + 1):
-    x_train[:,j] = x_theta_tseries[j]
-
-# create an array to hold the full feature vector for training time
-# (use ones so the constant term is already 1)
-out_train = np.ones((dtot + cte,train_length))  
-
-# copy over the linear part (shift over by one to account for constant if needed)
-out_train[cte:dlin + cte,:] = x_train[:,:train_length]
-
-# fill in the non-linear part, order = 2
-cnt = 0
-for row1 in range(dlin):
-    for row2 in range(row1,dlin):
-        # shift by one for constant if needed
-        out_train[dlin + cnt + cte] = x_train[row1,:train_length] * x_train[row2,:train_length]
-        cnt += 1
-
-# fill in the non-linear part, order = 3
-for row1 in range(dlin):
-    for row2 in range(row1,dlin):
-        for row3 in range(row2,dlin):
-            out_train[dlin + cnt + cte] = x_train[row1,:train_length] * x_train[row2,:train_length] * x_train[row3,:train_length]
-            cnt += 1
-
-# compute the pseudo-inverse matrix error
-
-pinv_error_matrix = np.linalg.pinv(out_train[:,:] @ out_train[:,:].T) @ (out_train[:,:] @ out_train[:,:].T) - np.identity(out_train.shape[0])
-pinv_error = np.sum(pinv_error_matrix**2) / out_train.shape[0]**2
-
+print('eAIC MSE: {}'.format(MSE))
 print('eAIC pinv error: {}'.format(pinv_error))

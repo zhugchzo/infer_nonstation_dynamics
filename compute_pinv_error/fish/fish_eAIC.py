@@ -199,6 +199,8 @@ dic_sparse_node_dictionary = {}
 dic_ridge_node_dictionary = {}
 dic_sparse_AIC = {}
 dic_ridge_AIC = {}
+dic_sparse_MSE = {}
+dic_ridge_MSE = {}
 
 for initial_theta in grid_initial_theta:
 
@@ -747,7 +749,9 @@ for initial_theta in grid_initial_theta:
             AIC_ridge = 1e5
 
         dic_sparse_AIC['({},{})'.format(initial_theta,delta_theta)] = AIC_sparse
-        dic_ridge_AIC['({},{})'.format(initial_theta,delta_theta)] = AIC_ridge  
+        dic_ridge_AIC['({},{})'.format(initial_theta,delta_theta)] = AIC_ridge
+        dic_sparse_MSE['({},{})'.format(initial_theta,delta_theta)] = sparse_MSE
+        dic_ridge_MSE['({},{})'.format(initial_theta,delta_theta)] = ridge_MSE  
 
 #####################################################################################
 
@@ -757,11 +761,13 @@ min_key_ridge = min(dic_ridge_AIC, key=dic_ridge_AIC.get)
 if dic_sparse_AIC[min_key_sparse] < dic_ridge_AIC[min_key_ridge]:
     min_key = min_key_sparse
     node_dictionary_list = dic_sparse_node_dictionary[min_key]
+    MSE = dic_sparse_MSE[min_key]
 
     print('best virtual forcing parameter and regression is SINDy:{}'.format(min_key))
 else:
     min_key = min_key_ridge
     node_dictionary_list = dic_ridge_node_dictionary[min_key]
+    MSE = dic_ridge_MSE[min_key]
 
     print('best virtual forcing parameter and regression is Ridge:{}'.format(min_key))
 
@@ -890,5 +896,8 @@ for node in range(N):
 
     pinv_error += node_pinv_error / N
 
+#####################################################################################
+
+print('eAIC MSE: {}'.format(MSE))
 print('eAIC pinv error: {}'.format(pinv_error))
 

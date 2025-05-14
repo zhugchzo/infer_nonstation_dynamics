@@ -1,0 +1,2 @@
+cte,x,p,sum_cos(xj-xi),x^2,px,xsum_cos(xj-xi),p^2,psum_cos(xj-xi),sum_cos^2(xj-xi),initial_theta,delta_theta
+0.19826214244021734,0.0,0.011514059299255603,-0.036599145087470426,0.0,0.0,0.0,0.0,0.0,0.0,-15.0,0.05

@@ -1,0 +1,2 @@
+cte,x,p,sum_cos(xj-xi),x^2,px,xsum_cos(xj-xi),p^2,psum_cos(xj-xi),sum_cos^2(xj-xi)
+0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.7155343049010459,-0.2112901179206381,0.0

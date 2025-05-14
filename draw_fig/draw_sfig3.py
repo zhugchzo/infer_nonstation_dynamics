@@ -90,7 +90,7 @@ for i in range(4):
 
                 ax2 = ax1.twinx()
                 ax2.plot(time, theta_tseries,linestyle='--',c='crimson',alpha=0.9,zorder=3)
-                ax2.set_ylabel('Value of the virtual variable',font_y1)
+                ax2.set_ylabel('Value of the optimal driving signal',font_y1)
 
                 ax1.yaxis.set_major_locator(MaxNLocator(nbins=4)) 
                 ax2.yaxis.set_major_locator(MaxNLocator(nbins=4))
@@ -102,7 +102,7 @@ for i in range(4):
                 legend_abundance = mlines.Line2D([], [], color='black', marker='none', linestyle='-', linewidth=2)
                 legend_temperature = mlines.Line2D([], [], color='royalblue', marker='none', linestyle='-', linewidth=2)
                 legend_vv = mlines.Line2D([], [], color='crimson', marker='none', linestyle='--', linewidth=2)
-                ax.legend(handles=[legend_abundance,legend_temperature,legend_vv],labels=['Abundance','Water temperature','Virtual variable'],loc='center',frameon=False, handlelength=1, prop={'size':24})
+                ax.legend(handles=[legend_abundance,legend_temperature,legend_vv],labels=['Abundance','Water temperature','Optimal driving signal'],loc='center',frameon=False, handlelength=1, prop={'size':24})
 
 
     elif i == 3:
