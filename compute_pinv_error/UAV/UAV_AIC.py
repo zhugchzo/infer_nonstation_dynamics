@@ -304,7 +304,7 @@ for row1 in range(dlin):
 # compute the pseudo-inverse matrix error
 
 pinv_error_matrix = np.linalg.pinv(out_train[:,:] @ out_train[:,:].T + ridge_param*np.identity(dtot+ cte)) @ (out_train[:,:] @ out_train[:,:].T + ridge_param*np.identity(dtot+ cte)) - np.identity(out_train.shape[0])
-pinv_error = np.sum(pinv_error_matrix**2) / out_train.shape[0]**2
+pinv_error = np.sum(pinv_error_matrix**2)# / out_train.shape[0]**2
 
 print('AIC MSE: {}'.format(MSE))
 print('AIC pinv error: {}'.format(pinv_error))

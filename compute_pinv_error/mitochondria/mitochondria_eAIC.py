@@ -271,6 +271,7 @@ else:
 best_initial_theta, best_delta_theta = min_key.strip('()').split(',')
 
 pinv_error = dic_pinv['({},{})'.format(best_initial_theta,best_delta_theta)]
+pinv_error = pinv_error * out_train.shape[0]**2
 
 #####################################################################################
 

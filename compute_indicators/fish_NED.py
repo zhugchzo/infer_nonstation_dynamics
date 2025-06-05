@@ -9,6 +9,7 @@ def normalize(arr):
     normalized_arr = np.zeros_like(arr)
     
     for i in range(arr.shape[1]):
+
         col = arr[:, i]
         col_min = col.min()
         col_max = col.max()

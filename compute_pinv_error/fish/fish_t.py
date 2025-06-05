@@ -329,7 +329,7 @@ for node in range(N):
     # compute the pseudo-inverse matrix error
 
     pinv_error_matrix = np.linalg.pinv(out_train[:,:] @ out_train[:,:].T) @ (out_train[:,:] @ out_train[:,:].T) - np.identity(out_train.shape[0])
-    node_pinv_error = np.sum(pinv_error_matrix**2) / out_train.shape[0]**2
+    node_pinv_error = np.sum(pinv_error_matrix**2)# / out_train.shape[0]**2
 
     pinv_error += node_pinv_error / N
 

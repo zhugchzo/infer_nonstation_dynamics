@@ -750,8 +750,8 @@ for initial_theta in grid_initial_theta:
 
         dic_sparse_AIC['({},{})'.format(initial_theta,delta_theta)] = AIC_sparse
         dic_ridge_AIC['({},{})'.format(initial_theta,delta_theta)] = AIC_ridge
-        dic_sparse_MSE['({},{})'.format(initial_theta,delta_theta)] = sparse_MSE
-        dic_ridge_MSE['({},{})'.format(initial_theta,delta_theta)] = ridge_MSE  
+        dic_sparse_MSE['({},{})'.format(initial_theta,delta_theta)] = sparse_MSE / N
+        dic_ridge_MSE['({},{})'.format(initial_theta,delta_theta)] = ridge_MSE / N 
 
 #####################################################################################
 
@@ -892,7 +892,7 @@ for node in range(N):
     # compute the pseudo-inverse matrix error
 
     pinv_error_matrix = np.linalg.pinv(out_train[:,:] @ out_train[:,:].T) @ (out_train[:,:] @ out_train[:,:].T) - np.identity(out_train.shape[0])
-    node_pinv_error = np.sum(pinv_error_matrix**2) / out_train.shape[0]**2
+    node_pinv_error = np.sum(pinv_error_matrix**2) / out_train.shape[0]
 
     pinv_error += node_pinv_error / N
 

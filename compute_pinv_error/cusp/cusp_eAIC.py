@@ -90,7 +90,7 @@ for al in [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2]:
                 # compute the pseudo-inverse matrix error
 
                 pinv_error_matrix = np.linalg.pinv(out_train[:,:] @ out_train[:,:].T) @ (out_train[:,:] @ out_train[:,:].T) - np.identity(out_train.shape[0])
-                pinv_error = np.sum(pinv_error_matrix**2)# / out_train.shape[0]**2 
+                pinv_error = np.sum(pinv_error_matrix**2) / out_train.shape[0]**2 
 
                 ##
                 ## SINDy
@@ -196,6 +196,7 @@ for al in [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2]:
         
         sparse_MSE = dic_sparse_MSE['({},{})'.format(best_initial_theta,best_delta_theta)]
         pinv_error = dic_sparse_pinv['({},{})'.format(best_initial_theta,best_delta_theta)]
+        pinv_error = pinv_error * out_train.shape[0]**2
 
         #####################################################################################
 
