@@ -1,8 +1,8 @@
-# Discovering governing equations for non-stationary complex systems by the optimal driving signal
+# Revealing dynamics of non-stationary complex systems from data
 
 This is the code repository to accompnay the article:
 
-***Discovering governing equations for non-stationary complex systems by the optimal driving signal.*** *Chengzuo Zhuge, Zheng Jiang, Zhefan Xu, Wei Chen.*
+***Revealing dynamics of non-stationary complex systems from data.*** *Chengzuo Zhuge, Zheng Jiang, Zhefan Xu, Wei Chen.*
 
 # Requirements
 
@@ -16,19 +16,21 @@ within a new virtual environment.
 
 # Directories
 
-**./cusp:** Code to generate the time series based on the equation of cusp bifurcation, and to apply our method to discover the governing equation and predict dynamics.
+**./cusp:** Code to generate the time series based on the equation of cusp bifurcation, to apply our method to discover the governing equation and predict dynamics, and to conduct the robustness tests.
 
-**./Koscillators:** Code to generate the time series based on the coupled equations of Kuramoto oscillators, and to apply our method to discover the governing equations and predict dynamics.
+**./Koscillators:** Code to generate the time series based on the coupled equations of Kuramoto oscillators, to apply our method to discover the governing equations and predict dynamics, and to conduct the robustness tests.
 
-**./mitochondria:** Code to apply our method to discover the governing equation and predict dynamics for the cellular system, and to use AUTO-07P to identify bifurcation of the inferred equation.
+**./mitochondria:** Code to apply our method to infer the equation and predict dynamics for the cellular system, and to use AUTO-07P to identify bifurcation of the inferred equation.
 
-**./UAV:** Code to apply our method to discover the governing equations and predict dynamics for the UAV navigation system.
+**./UAV:** Code to apply our method to infer the equations and predict dynamics for the UAV navigation system.
 
-**./fish:** Code to apply our method to discover the governing equations and predict dynamics for the natural marine fish community, and to test the correlation between the population fluctuation index and dynamic stability using the Kendall rank correlation test.
+**./chick:** Code to apply our method to infer the quation and predict dynamics for the physiological system, and to use AUTO-07P to identify bifurcation of the inferred equation.
 
-**./compute_indicators:** Code to compute sMAPE and NED for the results of five test systems. Code for the robustness tests.
+**./fish:** Code to apply our method to infer the equations and predict dynamics for the natural marine fish community, and to test the correlation between the population fluctuation index and dynamic stability using the Kendall rank correlation test.
 
-**./compute_pinv_error:** Code to compute the normalized numerical errors introduced by the pseudo-inverse in least squares estimation for five test systems.
+**./compute_indicators:** Code to compute sMAPE and NED for the results of six test systems. Code for the robustness tests.
+
+**./compute_pinv_error:** Code to compute the normalized numerical errors introduced by the pseudo-inverse in least squares estimation for six test systems.
 
 **./results:** Experimental results.
 
@@ -44,5 +46,7 @@ The empirical data used in this study are available from the following sources:
 
 2. **UAV obstacle avoidance trajectory** data is availalble in the csv file `./UAV/UAV_data.csv`. Data was collected by Zhefan Xu.
 
-3. **Marine fish community** data is in the csv files `./fish/fish_data.csv` and `./fish/fish_network.csv`. Data was collected by Reiji Masuda and was first published in [Ushio M, Hsieh C, Masuda R, et al. Fluctuating interaction network and time-varying stability of a natural fish community[J]. Nature, 2018, 554(7692): 360-363.] (https://www.nature.com/articles/nature25504).
+3. **Beating chick-heart** data is availalble in the csv files `./chick/chick_data_150.csv`, `./chick/chick_data_220.csv`, `./chick/chick_data_230.csv`, `./chick/chick_data_270.csv`, `./chick/chick_data_335.csv`, and `./chick/chick_data_600.csv`. Data was collected by Madhur Anand et al. and was first published in [Bury T M, Dylewsky D, Bauch C T, et al. Predicting discrete-time bifurcations with deep learning[J]. Nature Communications, 2023, 14(1): 6331.] (https://www.nature.com/articles/s41467-023-42020-z).
+
+4. **Marine fish community** data is in the csv files `./fish/fish_data.csv` and `./fish/fish_network.csv`. Data was collected by Reiji Masuda and was first published in [Ushio M, Hsieh C, Masuda R, et al. Fluctuating interaction network and time-varying stability of a natural fish community[J]. Nature, 2018, 554(7692): 360-363.] (https://www.nature.com/articles/nature25504).
 
