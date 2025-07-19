@@ -245,8 +245,8 @@ legend_fclsp = mlines.Line2D([], [], color='crimson', marker=r'$\times$', linest
 
 fig.legend(
     handles=[legend_v, legend_tclsp,  legend_t, legend_pd2, legend_AIC, legend_fclsp],
-    labels=['Optimal driving signal', 'Surrogates collapse (match)', 'Time variable',
-             'Surrogates enter period-2 (match)', r'Use AIC instead of $\epsilon$AIC', 'Surrogates collapse (mismatch)'],
+    labels=['Optimal driving signal', 'Equations collapse (match)', 'Time variable',
+             'Equations enter period-2 (match)', r'Use AIC instead of $\epsilon$AIC', 'Equations collapse (mismatch)'],
     loc='upper center',
     bbox_to_anchor=(0.5, 1.02),
     ncol=3,
