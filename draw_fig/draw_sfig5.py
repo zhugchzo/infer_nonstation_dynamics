@@ -1,7 +1,6 @@
 import pandas
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
-import matplotlib.patches as mpatches
 from matplotlib import font_manager
 
 font_x = {'family':'Arial','weight':'normal','size': 20}
@@ -39,7 +38,6 @@ ax1, ax2, ax3 = axs[0], axs[1], axs[2]
 chick_150_t1 = df_chick_150_tseries['Beat number']
 chick_150_t2 = df_chick_150_pred_1['Time']
 chick_150_t3 = df_chick_150_pred_2['Time']
-chick_150_t4 = df_chick_150_tseries[:chick_150_train_length]['Beat number']
 
 ibi = df_chick_150_tseries['IBI (s)']
 train_ibi = df_chick_150_gen['gen'][:chick_150_train_length]
@@ -59,14 +57,14 @@ df_chick_150_gen['distance'] = (df_chick_150_gen['Time'] - t_pd).abs()
 closest_row = df_chick_150_gen.loc[df_chick_150_gen['distance'].idxmin()]
 x_pd = closest_row['gen']
 
-ax1.plot(chick_150_t1,ibi,c='black',zorder=2)
-ax1.scatter(chick_150_t1,ibi,s=10,c='black',marker='o',zorder=2)
+ax1.plot(chick_150_t1[:chick_150_train_length],ibi[:chick_150_train_length],c='slategrey',zorder=2)
+ax1.scatter(chick_150_t1[:chick_150_train_length],ibi[:chick_150_train_length],s=10,c='slategrey',marker='o',zorder=2)
+ax1.plot(chick_150_t1[chick_150_train_length:],ibi[chick_150_train_length:],c='black',zorder=2)
+ax1.scatter(chick_150_t1[chick_150_train_length:],ibi[chick_150_train_length:],s=10,c='black',marker='o',zorder=2)
 ax1.scatter(chick_150_t2[::2],pred_ibi_1[::2],s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
 ax1.scatter(chick_150_t3,pred_ibi_2,s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
 
 ax1.scatter(t_pd,x_pd,s=150, marker='h',facecolors='white', edgecolors='black',zorder=5)
-
-ax1.fill_between(chick_150_t4,train_ibi-0.05,train_ibi+0.05,color='silver',alpha=0.9,linewidth=0,zorder=1)
 
 ax1.set_xlabel('Beat number',font_x,labelpad=0)
 ax1.set_ylabel('IBI (s)',font_y,labelpad=-15)
@@ -90,7 +88,6 @@ ax1.tick_params(axis='y', labelsize=18)
 chick_335_t1 = df_chick_335_tseries['Beat number']
 chick_335_t2 = df_chick_335_pred_1['Time']
 chick_335_t3 = df_chick_335_pred_2['Time']
-chick_335_t4 = df_chick_335_tseries[:chick_335_train_length]['Beat number']
 
 ibi = df_chick_335_tseries['IBI (s)']
 train_ibi = df_chick_335_gen['gen'][:chick_335_train_length]
@@ -110,14 +107,14 @@ df_chick_335_gen['distance'] = (df_chick_335_gen['Time'] - t_pd).abs()
 closest_row = df_chick_335_gen.loc[df_chick_335_gen['distance'].idxmin()]
 x_pd = closest_row['gen']
 
-ax2.plot(chick_335_t1,ibi,c='black',zorder=2)
-ax2.scatter(chick_335_t1,ibi,s=10,c='black',marker='o',zorder=2)
+ax2.plot(chick_335_t1[:chick_335_train_length],ibi[:chick_335_train_length],c='slategrey',zorder=2)
+ax2.scatter(chick_335_t1[:chick_335_train_length],ibi[:chick_335_train_length],s=10,c='slategrey',marker='o',zorder=2)
+ax2.plot(chick_335_t1[chick_335_train_length:],ibi[chick_335_train_length:],c='black',zorder=2)
+ax2.scatter(chick_335_t1[chick_335_train_length:],ibi[chick_335_train_length:],s=10,c='black',marker='o',zorder=2)
 ax2.scatter(chick_335_t2[::2],pred_ibi_1[::2],s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
 ax2.scatter(chick_335_t3,pred_ibi_2,s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
 
 ax2.scatter(t_pd,x_pd,s=150, marker='h',facecolors='white', edgecolors='black',zorder=5)
-
-ax2.fill_between(chick_335_t4,train_ibi-0.05,train_ibi+0.05,color='silver',alpha=0.9,linewidth=0,zorder=1)
 
 ax2.set_xlabel('Beat number',font_x,labelpad=0)
 ax2.set_ylabel('IBI (s)',font_y,labelpad=-15)
@@ -141,7 +138,6 @@ ax2.tick_params(axis='y', labelsize=18)
 chick_600_t1 = df_chick_600_tseries['Beat number']
 chick_600_t2 = df_chick_600_pred_1['Time']
 chick_600_t3 = df_chick_600_pred_2['Time']
-chick_600_t4 = df_chick_600_tseries[:chick_600_train_length]['Beat number']
 
 ibi = df_chick_600_tseries['IBI (s)']
 train_ibi = df_chick_600_gen['gen'][:chick_600_train_length]
@@ -161,14 +157,14 @@ df_chick_600_gen['distance'] = (df_chick_600_gen['Time'] - t_pd).abs()
 closest_row = df_chick_600_gen.loc[df_chick_600_gen['distance'].idxmin()]
 x_pd = closest_row['gen']
 
-ax3.plot(chick_600_t1,ibi,c='black',zorder=2)
-ax3.scatter(chick_600_t1,ibi,s=10,c='black',marker='o',zorder=2)
+ax3.plot(chick_600_t1[:chick_600_train_length],ibi[:chick_600_train_length],c='slategrey',zorder=2)
+ax3.scatter(chick_600_t1[:chick_600_train_length],ibi[:chick_600_train_length],s=10,c='slategrey',marker='o',zorder=2)
+ax3.plot(chick_600_t1[chick_600_train_length:],ibi[chick_600_train_length:],c='black',zorder=2)
+ax3.scatter(chick_600_t1[chick_600_train_length:],ibi[chick_600_train_length:],s=10,c='black',marker='o',zorder=2)
 ax3.scatter(chick_600_t2[::2],pred_ibi_1[::2],s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
 ax3.scatter(chick_600_t3,pred_ibi_2,s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
 
 ax3.scatter(t_pd,x_pd,s=150, marker='h',facecolors='white', edgecolors='black',zorder=5)
-
-ax3.fill_between(chick_600_t4,train_ibi-0.05,train_ibi+0.05,color='silver',alpha=0.9,linewidth=0,zorder=1)
 
 ax3.set_xlabel('Beat number',font_x,labelpad=0)
 ax3.set_ylabel('IBI (s)',font_y,labelpad=-15)
@@ -188,12 +184,12 @@ ax3.tick_params(axis='x', labelsize=18)
 ax3.tick_params(axis='y', labelsize=18)
 
 legend_state = mlines.Line2D([], [], color='black', marker='o', markersize=3, linestyle='-', markeredgewidth=1.5)
+legend_train = mlines.Line2D([], [], color='slategrey', marker='o', markersize=3, linestyle='-', markeredgewidth=1.5)
 legend_pstate = mlines.Line2D([], [], markerfacecolor='none',color='crimson', marker='o', markersize=5, linestyle='None', markeredgewidth=1.5)
 legend_pd = mlines.Line2D([], [], markerfacecolor='white',color='black', marker='h', markersize=5, linestyle='None', markeredgewidth=1.5)
-legend_fill = mpatches.Patch(color='silver', alpha=0.9, linewidth=0)
 
-fig.legend(handles=[legend_state,legend_pstate,legend_pd,legend_fill],
-           labels=['Inter-beat intervals','Prediction','Predicted period-doubling bifurcation','Training data'],
+fig.legend(handles=[legend_state,legend_train,legend_pstate,legend_pd],
+           labels=['Inter-beat intervals','Training data','Prediction','Predicted period-doubling bifurcation'],
            loc='upper center', bbox_to_anchor=(0.5, 1.02), ncol=4, frameon=False, markerscale=2.5,
            prop=font_manager.FontProperties(family='Arial Unicode MS', size=18))
 
