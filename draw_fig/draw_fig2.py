@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import matplotlib.lines as mlines
-import matplotlib.patches as mpatches
 from matplotlib import font_manager
 from matplotlib.patches import FancyArrow
 
@@ -153,15 +152,18 @@ ax2.set_title('Grid search result :'+'\n'+r'$\nu_1=-1,\,\Delta \nu=5\times10^{-3
 # ax3
 ax3.plot(t_cusp,x_cusp,c='black',zorder=2)
 ax3.scatter(t_cusp,x_cusp,s=10,c='black',marker='o',zorder=2)
+ax3.plot(t_cusp_train,trainx_cusp,c='slategrey',zorder=2)
+ax3.scatter(t_cusp_train,trainx_cusp,s=10,c='slategrey',marker='o',zorder=2)
 ax3.scatter(t_cusp_pred,predx_cusp,s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
 
-ax3.fill_between(t_cusp_train,trainx_cusp-0.1,trainx_cusp+0.1,color='silver',alpha=0.9,linewidth=0,zorder=1)
+# ax3.fill_between(t_cusp_train,trainx_cusp-0.1,trainx_cusp+0.1,color='silver',alpha=0.9,linewidth=0,zorder=1)
 
 legend_state = mlines.Line2D([], [], color='black', marker='o', markersize=3, linestyle='-', markeredgewidth=1.5)
+legend_train = mlines.Line2D([], [], color='slategrey', marker='o', markersize=3, linestyle='-', markeredgewidth=1.5)
 legend_pstate = mlines.Line2D([], [], markerfacecolor='none',color='crimson', marker='o', markersize=5, linestyle='None', markeredgewidth=1.5)
-legend_fill = mpatches.Patch(color='silver', alpha=0.9, linewidth=0)
+# legend_fill = mpatches.Patch(color='silver', alpha=0.9, linewidth=0)
 
-ax3.legend(handles=[legend_state,legend_pstate,legend_fill],labels=['True','Prediction','Training data'],loc='center', frameon=False, bbox_to_anchor=(0.35, 0.8), markerscale=2.5,prop={'size':16})
+ax3.legend(handles=[legend_state,legend_train,legend_pstate],labels=['True','Training data','Prediction'],loc='center', frameon=False, bbox_to_anchor=(0.35, 0.8), markerscale=2.5,prop={'size':16})
 
 ax3.set_xlabel('Timepoints',font_x)
 ax3.set_ylabel(r'$\mathbf{x}$',font_y,labelpad=10)
@@ -231,15 +233,18 @@ ax5.set_title('Grid search result :'+'\n'+r'$\nu_1=-1,\,\Delta \nu=5\times10^{-2
 # ax6
 ax6.plot(t_Koscillators,sum_delta_datax,c='black',zorder=2)
 ax6.scatter(t_Koscillators,sum_delta_datax,s=10,c='black',marker='o',zorder=2)
+ax6.plot(t_Koscillators_train,sum_delta_datax_train,c='slategrey',zorder=2)
+ax6.scatter(t_Koscillators_train,sum_delta_datax_train,s=10,c='slategrey',marker='o',zorder=2)
 ax6.scatter(t_Koscillators_pred,sum_delta_predx,s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
 
-ax6.fill_between(t_Koscillators_train,sum_delta_datax_train-0.04,sum_delta_datax_train+0.04,color='silver',alpha=0.9,linewidth=0,zorder=1)
+# ax6.fill_between(t_Koscillators_train,sum_delta_datax_train-0.04,sum_delta_datax_train+0.04,color='silver',alpha=0.9,linewidth=0,zorder=1)
 
 legend_state = mlines.Line2D([], [], color='black', marker='o', markersize=3, linestyle='-', markeredgewidth=1.5)
+legend_train = mlines.Line2D([], [], color='slategrey', marker='o', markersize=3, linestyle='-', markeredgewidth=1.5)
 legend_pstate = mlines.Line2D([], [], markerfacecolor='none',color='crimson', marker='o', markersize=5, linestyle='None', markeredgewidth=1.5)
-legend_fill = mpatches.Patch(color='silver', alpha=0.9, linewidth=0)
+# legend_fill = mpatches.Patch(color='silver', alpha=0.9, linewidth=0)
 
-ax6.legend(handles=[legend_state,legend_pstate,legend_fill],labels=['True','Prediction','Training data'],loc='center', frameon=False, bbox_to_anchor=(0.3, 0.8), markerscale=2.5,prop={'size':16})
+ax6.legend(handles=[legend_state,legend_train,legend_pstate],labels=['True','Training data','Prediction'],loc='center', frameon=False, bbox_to_anchor=(0.3, 0.8), markerscale=2.5,prop={'size':16})
 
 ax6.set_xlabel('Timepoints',font_x)
 ax6.set_ylabel(r'$\sum\left|\Delta \theta_i\right|$',font_y,labelpad=-5)

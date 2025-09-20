@@ -5,35 +5,6 @@ import matplotlib.lines as mlines
 from matplotlib import font_manager
 from matplotlib.ticker import MaxNLocator
 
-def encode_date_tag(tag,min,delta): # this function is used to transform date to theta
-
-    month, part = tag.split('-')[-2], tag.split('-')[-1]
-    month = int(month)  
-
-    if 2 <= month < 8:
-        if part == "early":
-            return (month - 2) * 2*delta + min  # early
-        elif part == "late":
-            return (month - 2) * 2*delta + min + delta  # late
-        
-    elif 9 <= month <= 12:
-        if part == "early":
-            return -(month - 8) * 2*delta + min + 12*delta  # early
-        elif part == "late":
-            return -(month - 8) * 2*delta + min + 11*delta  # late
-
-    elif month == 1:
-        if part == "early":
-            return min + 2*delta  # early
-        elif part == "late":
-            return min + 1*delta  # late 
-            
-    elif month == 8:
-        if part == "early":
-            return min + 12*delta  # early
-        elif part == "late":
-            return min + 11*delta  # late
-
 font_x = font_manager.FontProperties(family='Arial', size=24, weight='normal')
 font_y = font_manager.FontProperties(family='Arial', size=24, weight='normal')
 font_y1 = {'family':'Arial','weight':'normal','size': 14}
@@ -57,7 +28,6 @@ N = len(col)
 
 data_tseries = df_tseries[col].values
 temperature_tseries = df_tseries['surf.t'].values
-theta_tseries = (df_tseries['date_tag'].apply(lambda x: encode_date_tag(x, min=0, delta=1))).values
 
 length = len(data_tseries)
 time = np.arange(1, 1 + length, 1)
@@ -81,19 +51,14 @@ for i in range(4):
                 cnt += 1
 
             elif j == 2:
-                ax1 = axs[i, j]
-                ax1.plot(time, temperature_tseries,c='royalblue',zorder=2)
+                ax = axs[i, j]
+                ax.plot(time, temperature_tseries,c='royalblue',zorder=2)
                 for count_y in range(6):
-                    ax1.axvspan(time[14+48*count_y],time[14+48*count_y+23], color='silver', alpha=0.3, linewidth=0, zorder=1)
-                ax1.set_xticks([])
-                ax1.set_ylabel('Water temperature',font_y1)
+                    ax.axvspan(time[14+48*count_y],time[14+48*count_y+23], color='silver', alpha=0.3, linewidth=0, zorder=1)
+                ax.set_xticks([])
+                ax.set_ylabel('Temperature (\u00B0C)',font_y1)
 
-                ax2 = ax1.twinx()
-                ax2.plot(time, theta_tseries,linestyle='--',c='crimson',alpha=0.9,zorder=3)
-                ax2.set_ylabel('Value of the optimal driving signal',font_y1)
-
-                ax1.yaxis.set_major_locator(MaxNLocator(nbins=4)) 
-                ax2.yaxis.set_major_locator(MaxNLocator(nbins=4))
+                ax.yaxis.set_major_locator(MaxNLocator(nbins=4)) 
                 
             elif j == 3:
                 ax = axs[i, j]
@@ -101,8 +66,7 @@ for i in range(4):
 
                 legend_abundance = mlines.Line2D([], [], color='black', marker='none', linestyle='-', linewidth=2)
                 legend_temperature = mlines.Line2D([], [], color='royalblue', marker='none', linestyle='-', linewidth=2)
-                legend_vv = mlines.Line2D([], [], color='crimson', marker='none', linestyle='--', linewidth=2)
-                ax.legend(handles=[legend_abundance,legend_temperature,legend_vv],labels=['Abundance','Water temperature','Optimal driving signal'],loc='center',frameon=False, handlelength=1, prop={'size':24})
+                ax.legend(handles=[legend_abundance,legend_temperature],labels=['Abundance','Water temperature'],loc='center',frameon=False, handlelength=1, prop={'size':24})
 
 
     elif i == 3:
