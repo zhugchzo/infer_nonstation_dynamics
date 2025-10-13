@@ -92,7 +92,7 @@ for al in [0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2]:
                 W_out_sparse = (x_train[0:d,1:train_length + 1] - x_train[0:d,:train_length])/dt @ out_train[:, :].T @ np.linalg.pinv(out_train[:, :] @ out_train[:, :].T)  # Initial least-squares solution
 
                 # Set the sparsification parameter lambda
-                lambda_param = 1e-2  # Adjustable parameter, modify according to your data
+                lambda_param = 2.5e-3  # Adjustable parameter, modify according to your data
 
                 # Perform sparsification, iterate multiple times to obtain a sparse solution
                 for k in range(10):  # Number of iterations, can be adjusted as needed

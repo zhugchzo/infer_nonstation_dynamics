@@ -670,30 +670,30 @@ for tl in [300, 350, 400, 450, 500]:
 
         row_count += 1    
 
-    smape_matrix_2 = np.mean(smape_matrix_2[:,100:], axis=1)
-    smape_matrix_3 = np.mean(smape_matrix_3[:,100:], axis=1)
-    smape_matrix_4 = np.mean(smape_matrix_4[:,100:], axis=1)
-    smape_matrix_5 = np.mean(smape_matrix_5[:,100:], axis=1)
+    smape_matrix_2 = np.mean(smape_matrix_2[:,10:], axis=1)
+    smape_matrix_3 = np.mean(smape_matrix_3[:,10:], axis=1)
+    smape_matrix_4 = np.mean(smape_matrix_4[:,10:], axis=1)
+    smape_matrix_5 = np.mean(smape_matrix_5[:,10:], axis=1)
     
     smape_matrix_2 = smape_matrix_2[~np.isnan(smape_matrix_2)]
     smape_matrix_3 = smape_matrix_3[~np.isnan(smape_matrix_3)]
     smape_matrix_4 = smape_matrix_4[~np.isnan(smape_matrix_4)]
     smape_matrix_5 = smape_matrix_5[~np.isnan(smape_matrix_5)]
 
-    smape_matrix_p_2 = np.mean(smape_matrix_p_2[:,100:], axis=1)
-    smape_matrix_p_3 = np.mean(smape_matrix_p_3[:,100:], axis=1)
-    smape_matrix_p_4 = np.mean(smape_matrix_p_4[:,100:], axis=1)
-    smape_matrix_p_5 = np.mean(smape_matrix_p_5[:,100:], axis=1)
+    smape_matrix_p_2 = np.mean(smape_matrix_p_2[:,10:], axis=1)
+    smape_matrix_p_3 = np.mean(smape_matrix_p_3[:,10:], axis=1)
+    smape_matrix_p_4 = np.mean(smape_matrix_p_4[:,10:], axis=1)
+    smape_matrix_p_5 = np.mean(smape_matrix_p_5[:,10:], axis=1)
 
     smape_matrix_p_2 = smape_matrix_p_2[~np.isnan(smape_matrix_p_2)]
     smape_matrix_p_3 = smape_matrix_p_3[~np.isnan(smape_matrix_p_3)]
     smape_matrix_p_4 = smape_matrix_p_4[~np.isnan(smape_matrix_p_4)]
     smape_matrix_p_5 = smape_matrix_p_5[~np.isnan(smape_matrix_p_5)]
     
-    smape_matrix_t_2 = np.mean(smape_matrix_t_2[:,100:], axis=1)
-    smape_matrix_t_3 = np.mean(smape_matrix_t_3[:,100:], axis=1)
-    smape_matrix_t_4 = np.mean(smape_matrix_t_4[:,100:], axis=1)
-    smape_matrix_t_5 = np.mean(smape_matrix_t_5[:,100:], axis=1)
+    smape_matrix_t_2 = np.mean(smape_matrix_t_2[:,10:], axis=1)
+    smape_matrix_t_3 = np.mean(smape_matrix_t_3[:,10:], axis=1)
+    smape_matrix_t_4 = np.mean(smape_matrix_t_4[:,10:], axis=1)
+    smape_matrix_t_5 = np.mean(smape_matrix_t_5[:,10:], axis=1)
     
     smape_matrix_t_2 = smape_matrix_t_2[~np.isnan(smape_matrix_t_2)]
     smape_matrix_t_3 = smape_matrix_t_3[~np.isnan(smape_matrix_t_3)]

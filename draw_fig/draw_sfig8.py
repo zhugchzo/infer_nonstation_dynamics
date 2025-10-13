@@ -1,73 +1,127 @@
-import pandas as pd
+import pandas
+import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.lines as mlines
-from scipy.stats import kendalltau
+import networkx as nx
 
-font_x = {'family':'Arial','weight':'normal','size': 28}
-font_y1 = {'family':'Arial','weight':'normal','size': 20}
-font_y2 = {'family':'Arial','weight':'normal','size': 24}
+font_x = {'family':'Arial','weight':'medium','size': 24}
+font_y = {'family':'Arial','weight':'medium','size': 24}
 
 plt.rcParams['font.family'] = 'Arial'
 plt.rcParams['axes.labelweight'] = 'bold'
+plt.rcParams['xtick.labelsize'] = 18
+plt.rcParams['ytick.labelsize'] = 18
 
-df_dom_eval = pd.read_csv('../results/fish/dom_eval.csv')
-df_var = pd.read_csv('../results/fish/fish_var.csv')
+df_network = pandas.read_csv('../fish/fish_network.csv')
 
 col = ['Aurelia.sp', 'Plotosus.japonicus', 'Sebastes.cheni', 'Trachurus.japonicus', 'Girella.punctata',
        'Pseudolabrus.sieboldi', 'Parajulis.poecilopterus', 'Halichoeres.tenuispinnis', 'Chaenogobius.gulosus',
        'Pterogobius.zonoleucus', 'Tridentiger.trigonocephalus', 'Siganus.fuscescens', 'Sphyraena.pinguis', 'Rudarius.ercodes']
 
+name = ['J.', 'P.j.', 'S.c.', 'T.j.', 'G.p.', 'P.s.', 'P.p.', 'H.t.', 'C.g.', 'P.z.', 'T.t.', 'S.f.', 'S.p.', 'R.e.']
+
+# the number of node
 N = len(col)
 
-var_tseries = df_var.values.reshape(-1)
+# draw
+fig, axs = plt.subplots(1, 3, figsize=(15,4.5))
 
-t = df_dom_eval['Time'][:275]
-dom_eval = df_dom_eval['dom_eval'].values.reshape(-1)[:275]
+ax1, ax2, ax3 = axs[0], axs[1], axs[2]
 
-tau, p_value = kendalltau(var_tseries, dom_eval)
+# ax1
+data_network = df_network[col].values
 
-print(f"Kendall's tau: {tau}")
-print(f"P-value: {p_value}")
+G = nx.DiGraph()
 
-fig, ax1 = plt.subplots(figsize=(12,6))
+nodes = [i for i in range(N)]
 
-ax1.plot(t, dom_eval, c='black', linewidth=2, zorder=2)
+G.add_nodes_from(nodes)
 
-for i in [0,2,4,6,8]:
-       ax1.axvspan(t[14+24*i],t[37+24*i], color='silver', alpha=0.3, linewidth=0, zorder=1)
-ax1.axvspan(t[14+24*10],t[274], color='silver', alpha=0.3, linewidth=0, zorder=1)
+edge = []
+for i in range(N):
+    for j in range(N):
+        if data_network[j, i] == 1:
+            edge.append((j, i))
 
-positions = list()
-for i in [0,2,4,6,8,10]:
-       positions.append(t[25+24*i])
+G.add_edges_from(edge)
 
-years = ['2003','2005', '2007', '2009', '2011', '2013']
-ax1.set_xticks(positions)
-ax1.set_xticklabels(years, fontsize=18) 
-ax1.tick_params(axis='x', which='both', bottom=False)
-ax1.tick_params(direction='in')
+pos = {}
+radius = 2
+for i, node in enumerate(nodes):
+    angle = -2 * np.pi * i / N + np.pi / 2
+    x = radius * np.cos(angle)
+    y = radius * np.sin(angle)
+    pos[node] = (x, y)
 
-ax1.set_xlabel('Year',font_x,labelpad=10)
+ax1.axis('off')
+ax1.set_aspect('equal')
 
-ax1.set_yticks([0,6000,12000])
-ax1.set_yticklabels(['0','6','12'], fontsize=18) 
+nx.draw(G, pos, ax=ax1,
+with_labels=False,
+node_size=100,
+node_color='darkslateblue',
+edgecolors='darkslateblue',
+edge_color='silver',
+arrowstyle='->',
+arrowsize=12,width=2)
 
-ax1.set_ylabel(r'Modulus of the dominant eigenvalue ($10^3$)',font_y1,labelpad=10)
+label_radius1 = radius * 1.15
+label_radius2 = radius * 1.2
+label_radius3 = radius * 1.25
+for i, node in enumerate(nodes):
+    if i in [4]:
+        angle = -2 * np.pi * i / N + np.pi / 2
+        label_x = label_radius3 * np.cos(angle)
+        label_y = label_radius3 * np.sin(angle)
+        ax1.text(label_x, label_y, name[i], fontsize=13, fontstyle='italic', fontfamily='DejaVu Sans', ha='center', va='center')
+    elif i in [2,3,5,11,12]:
+        angle = -2 * np.pi * i / N + np.pi / 2
+        label_x = label_radius2 * np.cos(angle)
+        label_y = label_radius2 * np.sin(angle)
+        ax1.text(label_x, label_y, name[i], fontsize=13, fontstyle='italic', fontfamily='DejaVu Sans', ha='center', va='center')
+    else:                       
+        angle = -2 * np.pi * i / N + np.pi / 2
+        label_x = label_radius1 * np.cos(angle)
+        label_y = label_radius1 * np.sin(angle)
+        ax1.text(label_x, label_y, name[i], fontsize=13, fontstyle='italic', fontfamily='DejaVu Sans', ha='center', va='center')
 
-ax2 = ax1.twinx()
-ax2.plot(t, var_tseries, c='crimson', linestyle='--', linewidth=2, zorder=2)
+ax1.text(-0.15, 0.96,'A',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':24,'weight':'bold'})
 
-ax2.set_yticks([0,0.75,1.5])
-ax2.set_yticklabels(['0','0.75','1.5'], fontsize=18)
+# ax2
+in_degree = np.sum(data_network == 1, axis=0)
+in_degree_values, in_degree_counts = np.unique(in_degree, return_counts=True)
+
+ax2.plot(in_degree_values,in_degree_counts,c='darkslateblue',linewidth=3,alpha=0.8)
+ax2.scatter(in_degree_values,in_degree_counts,c='darkslateblue',s=100)
+
+ax2.set_xticks([0,1,2])
+
+ax2.set_ylim(3.8,6.2)
+ax2.set_yticks([4,5,6])
 ax2.tick_params(direction='in')
 
-ax2.set_ylabel('Variance',font_y2,labelpad=15)
+ax2.set_xlabel('In-degree',font_x)
+ax2.set_ylabel('Frequency',font_y,labelpad=15)
 
-legend_dom_eval = mlines.Line2D([], [], color='black', marker='none', linestyle='-', linewidth=2)
-legend_var = mlines.Line2D([], [], color='crimson', marker='none', linestyle='--', linewidth=2)
-ax1.legend(handles=[legend_dom_eval,legend_var],labels=['Modulus of the \ndominant eigenvalue','Variance'],loc='center',frameon=False,bbox_to_anchor=(0.85, 0.9), prop={'size':15})
+ax2.text(-0.15, 0.96,'B',ha='left', transform=ax2.transAxes,fontdict={'family':'Arial','size':24,'weight':'bold'})
 
-plt.subplots_adjust(top=0.98, bottom=0.14, left=0.07, right=0.9)
+# ax3
+in_degree = np.sum(data_network == 1, axis=1)
+in_degree_values, in_degree_counts = np.unique(in_degree, return_counts=True)
+
+ax3.plot(in_degree_values,in_degree_counts,c='darkslateblue',linewidth=3,alpha=0.8)
+ax3.scatter(in_degree_values,in_degree_counts,c='darkslateblue',s=100)
+
+ax3.set_xticks([0,1,2,3])
+
+ax3.set_ylim(0.5,7.5)
+ax3.set_yticks([1,2,3,4,5,6,7])
+ax3.tick_params(direction='in')
+
+ax3.set_xlabel('Out-degree',font_x)
+ax3.set_ylabel('Frequency',font_y,labelpad=15)
+
+ax3.text(-0.15, 0.96,'C',ha='left', transform=ax3.transAxes,fontdict={'family':'Arial','size':24,'weight':'bold'})
+
+plt.subplots_adjust(top=0.96, bottom=0.15, left=0.04, right=0.98, hspace=0.25, wspace=0.3)
 plt.savefig('../figures/SFIG8.pdf',format='pdf')
 plt.savefig('/Users/zhugchzo/Desktop/3paper_fig/SFIG8.png',format='png',dpi=600)
-

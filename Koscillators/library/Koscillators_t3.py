@@ -25,11 +25,6 @@ dtot = dlin + dnonlin
 f_library = ['cte', 'x', 'p', 'sin', 'x^2', 'px', 'xsin', 'p^2', 'psin', 'sin^2',
              'x^3', 'px^2', 'x^2sin', 'p^2x', 'pxsin', 'xsin^2', 'p^3', 'p^2sin', 'psin^2', 'sin^3']
 
-col_x = ['x0', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7', 'x8', 'x9', 'x10']
-
-# the number of node
-N = len(col_x)
-
 for tl in [300, 350, 400, 450, 500]:
 
     if not os.path.exists('../../results/Koscillators/library3/{}'.format(tl)):
@@ -44,6 +39,14 @@ for tl in [300, 350, 400, 450, 500]:
         df_network = pd.read_csv('../Koscillators_data/Koscillators_network_{}.csv'.format(rand_seed),header=None)
 
         data_network = df_network.values
+
+        # the number of node
+        N = len(data_network)
+
+        col_x = []
+
+        for node in range(N):
+            col_x.append('x{}'.format(node))
 
         data_tseries = df_tseries[col_x].values
         t_series = df_tseries['t'].values
@@ -128,7 +131,7 @@ for tl in [300, 350, 400, 450, 500]:
 
         # Set the sparsification parameter lambda
         # Adjustable parameter, modify according to your data
-        lambda_param = 1e-2
+        lambda_param = 1e-3
 
         # Perform sparsification, iterate multiple times to obtain a sparse solution
         for k in range(10):  # Number of iterations, can be adjusted as needed

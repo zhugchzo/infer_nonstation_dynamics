@@ -11,9 +11,6 @@ dt = 0.01
 t0 = 0
 tburn = 500 # burn-in period
 
-n = 11
-md = 5
-
 # define dynamics
 def de_fun(x, A, w, p, N):
 
@@ -29,7 +26,11 @@ for rand_seed in range(100):
 
     np.random.seed(rand_seed)
 
-    g = nx.erdos_renyi_graph(n=n, p=md/(n-1), directed=False, seed=int(rand_seed))  # 使用示例参数生成网络
+    n = np.random.randint(10, 50)
+
+    g = nx.erdos_renyi_graph(n=n, p=0.2, directed=False, seed=int(rand_seed))  # 使用示例参数生成网络
+
+    g.remove_nodes_from(list(nx.isolates(g)))
 
     N = len(g)
 

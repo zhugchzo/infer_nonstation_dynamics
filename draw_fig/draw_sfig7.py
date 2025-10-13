@@ -1,127 +1,105 @@
 import pandas
 import numpy as np
 import matplotlib.pyplot as plt
-import networkx as nx
+import matplotlib.lines as mlines
+from matplotlib import font_manager
+from matplotlib.ticker import MaxNLocator
 
-font_x = {'family':'Arial','weight':'medium','size': 24}
-font_y = {'family':'Arial','weight':'medium','size': 24}
+font_x = font_manager.FontProperties(family='Arial', size=24, weight='normal')
+font_y = font_manager.FontProperties(family='Arial', size=24, weight='normal')
+font_y1 = {'family':'Arial','weight':'normal','size': 14}
+font_title = {'family':'DejaVu Sans','weight':'light','size': 18, 'style': 'italic'}
 
 plt.rcParams['font.family'] = 'Arial'
 plt.rcParams['axes.labelweight'] = 'bold'
-plt.rcParams['xtick.labelsize'] = 18
-plt.rcParams['ytick.labelsize'] = 18
 
-df_network = pandas.read_csv('../fish/fish_network.csv')
+df_tseries = pandas.read_csv('../fish/fish_data.csv')
 
 col = ['Aurelia.sp', 'Plotosus.japonicus', 'Sebastes.cheni', 'Trachurus.japonicus', 'Girella.punctata',
        'Pseudolabrus.sieboldi', 'Parajulis.poecilopterus', 'Halichoeres.tenuispinnis', 'Chaenogobius.gulosus',
        'Pterogobius.zonoleucus', 'Tridentiger.trigonocephalus', 'Siganus.fuscescens', 'Sphyraena.pinguis', 'Rudarius.ercodes']
 
-name = ['J.', 'P.j.', 'S.c.', 'T.j.', 'G.p.', 'P.s.', 'P.p.', 'H.t.', 'C.g.', 'P.z.', 'T.t.', 'S.f.', 'S.p.', 'R.e.']
+name = ['Jellyfish (Aurelia sp.)', 'Plotosus japonicus', 'Sebastes cheni', 'Trachurus japonicus', 'Girella punctata',
+       'Pseudolabrus sieboldi', 'Parajulis poecilopterus', 'Halichoeres tenuispinnis', 'Chaenogobius gulosus',
+       'Pterogobius zonoleucus', 'Tridentiger trigonocephalus', 'Siganus fuscescens', 'Sphyraena pinguis', 'Rudarius ercodes']
 
 # the number of node
 N = len(col)
 
-# draw
-fig, axs = plt.subplots(1, 3, figsize=(15,4.5))
+data_tseries = df_tseries[col].values
+temperature_tseries = df_tseries['surf.t'].values
 
-ax1, ax2, ax3 = axs[0], axs[1], axs[2]
+length = len(data_tseries)
+time = np.arange(1, 1 + length, 1)
 
-# ax1
-data_network = df_network[col].values
+fig, axs = plt.subplots(4, 4, figsize=(18,12))
 
-G = nx.DiGraph()
+cnt = 0
 
-nodes = [i for i in range(N)]
+for i in range(4):
+    if i == 0:
+        for j in range(4):
+            if j < 2:
+                ax = axs[i, j]
+                ax.plot(time, data_tseries[:,cnt],c='black',zorder=2)
+                for count_y in range(6):
+                    ax.axvspan(time[14+48*count_y],time[14+48*count_y+23], color='silver', alpha=0.3, linewidth=0, zorder=1)
+                ax.yaxis.set_major_locator(MaxNLocator(nbins=4)) 
+                ax.set_title(name[cnt],fontdict=font_title)
+                ax.set_xticks([])
+                ax.tick_params(axis='y', labelsize=14)
+                cnt += 1
 
-G.add_nodes_from(nodes)
+            elif j == 2:
+                ax = axs[i, j]
+                ax.plot(time, temperature_tseries,c='royalblue',zorder=2)
+                for count_y in range(6):
+                    ax.axvspan(time[14+48*count_y],time[14+48*count_y+23], color='silver', alpha=0.3, linewidth=0, zorder=1)
+                ax.set_xticks([])
+                ax.set_ylabel('Temperature (\u00B0C)',font_y1)
 
-edge = []
-for i in range(N):
-    for j in range(N):
-        if data_network[j, i] == 1:
-            edge.append((j, i))
+                ax.yaxis.set_major_locator(MaxNLocator(nbins=4)) 
+                
+            elif j == 3:
+                ax = axs[i, j]
+                ax.axis('off')
 
-G.add_edges_from(edge)
+                legend_abundance = mlines.Line2D([], [], color='black', marker='none', linestyle='-', linewidth=2)
+                legend_temperature = mlines.Line2D([], [], color='royalblue', marker='none', linestyle='-', linewidth=2)
+                ax.legend(handles=[legend_abundance,legend_temperature],labels=['Abundance','Water temperature'],loc='center',frameon=False, handlelength=1, prop={'size':24})
 
-pos = {}
-radius = 2
-for i, node in enumerate(nodes):
-    angle = -2 * np.pi * i / N + np.pi / 2
-    x = radius * np.cos(angle)
-    y = radius * np.sin(angle)
-    pos[node] = (x, y)
 
-ax1.axis('off')
-ax1.set_aspect('equal')
+    elif i == 3:
+        for j in range(4):
+            ax = axs[i, j]
+            ax.plot(time, data_tseries[:,cnt],c='black',zorder=2)
+            for count_y in range(6):
+                ax.axvspan(time[14+48*count_y],time[14+48*count_y+23], color='silver', alpha=0.3, linewidth=0, zorder=1)
+            ax.yaxis.set_major_locator(MaxNLocator(nbins=4))
+            ax.set_title(name[cnt],fontdict=font_title)
+            positions = [time[27], time[75], time[123], time[171], time[219], time[267]]
+            years = ['2003', '2005', '2007', '2009', '2011', '2013']
+            ax.set_xticks(positions)
+            ax.set_xticklabels(years, fontsize=14, fontfamily='Arial') 
+            ax.tick_params(axis='x', which='both', bottom=False)
+            ax.tick_params(axis='y', labelsize=14) 
+            cnt += 1        
 
-nx.draw(G, pos, ax=ax1,
-with_labels=False,
-node_size=100,
-node_color='darkslateblue',
-edgecolors='darkslateblue',
-edge_color='silver',
-arrowstyle='->',
-arrowsize=12,width=2)
+    else:
+        for j in range(4):
+            ax = axs[i, j]
+            ax.plot(time, data_tseries[:,cnt],c='black',zorder=2)
+            for count_y in range(6):
+                ax.axvspan(time[14+48*count_y],time[14+48*count_y+23], color='silver', alpha=0.3, linewidth=0, zorder=1)
+            ax.yaxis.set_major_locator(MaxNLocator(nbins=4))
+            ax.set_title(name[cnt],fontdict=font_title)
+            ax.set_xticks([])
+            ax.tick_params(axis='y', labelsize=14) 
+            cnt += 1
 
-label_radius1 = radius * 1.15
-label_radius2 = radius * 1.2
-label_radius3 = radius * 1.25
-for i, node in enumerate(nodes):
-    if i in [4]:
-        angle = -2 * np.pi * i / N + np.pi / 2
-        label_x = label_radius3 * np.cos(angle)
-        label_y = label_radius3 * np.sin(angle)
-        ax1.text(label_x, label_y, name[i], fontsize=13, fontstyle='italic', fontfamily='DejaVu Sans', ha='center', va='center')
-    elif i in [2,3,5,11,12]:
-        angle = -2 * np.pi * i / N + np.pi / 2
-        label_x = label_radius2 * np.cos(angle)
-        label_y = label_radius2 * np.sin(angle)
-        ax1.text(label_x, label_y, name[i], fontsize=13, fontstyle='italic', fontfamily='DejaVu Sans', ha='center', va='center')
-    else:                       
-        angle = -2 * np.pi * i / N + np.pi / 2
-        label_x = label_radius1 * np.cos(angle)
-        label_y = label_radius1 * np.sin(angle)
-        ax1.text(label_x, label_y, name[i], fontsize=13, fontstyle='italic', fontfamily='DejaVu Sans', ha='center', va='center')
+fig.supxlabel('Year',x=0.535, y=0, fontproperties=font_x)
+fig.supylabel('Abundance',x=0.005, y=0.55, fontproperties=font_y)
 
-ax1.text(-0.1, 0.96,'a',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':24,'weight':'bold'})
-
-# ax2
-in_degree = np.sum(data_network == 1, axis=0)
-in_degree_values, in_degree_counts = np.unique(in_degree, return_counts=True)
-
-ax2.plot(in_degree_values,in_degree_counts,c='darkslateblue',linewidth=3,alpha=0.8)
-ax2.scatter(in_degree_values,in_degree_counts,c='darkslateblue',s=100)
-
-ax2.set_xticks([0,1,2])
-
-ax2.set_ylim(3.8,6.2)
-ax2.set_yticks([4,5,6])
-ax2.tick_params(direction='in')
-
-ax2.set_xlabel('In-degree',font_x)
-ax2.set_ylabel('Frequency',font_y,labelpad=15)
-
-ax2.text(-0.1, 0.96,'b',ha='left', transform=ax2.transAxes,fontdict={'family':'Arial','size':24,'weight':'bold'})
-
-# ax3
-in_degree = np.sum(data_network == 1, axis=1)
-in_degree_values, in_degree_counts = np.unique(in_degree, return_counts=True)
-
-ax3.plot(in_degree_values,in_degree_counts,c='darkslateblue',linewidth=3,alpha=0.8)
-ax3.scatter(in_degree_values,in_degree_counts,c='darkslateblue',s=100)
-
-ax3.set_xticks([0,1,2,3])
-
-ax3.set_ylim(0.5,7.5)
-ax3.set_yticks([1,2,3,4,5,6,7])
-ax3.tick_params(direction='in')
-
-ax3.set_xlabel('Out-degree',font_x)
-ax3.set_ylabel('Frequency',font_y,labelpad=15)
-
-ax3.text(-0.1, 0.96,'c',ha='left', transform=ax3.transAxes,fontdict={'family':'Arial','size':24,'weight':'bold'})
-
-plt.subplots_adjust(top=0.96, bottom=0.15, left=0.04, right=0.98, hspace=0.25, wspace=0.3)
+plt.subplots_adjust(top=0.96, bottom=0.06, left=0.055, right=0.99, hspace=0.25, wspace=0.16)
 plt.savefig('../figures/SFIG7.pdf',format='pdf')
 plt.savefig('/Users/zhugchzo/Desktop/3paper_fig/SFIG7.png',format='png',dpi=600)

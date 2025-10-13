@@ -49,14 +49,25 @@ NED_matrix_t = np.zeros((100,pred_length))
 
 row_count = 0
 
-pred_col = ['predx_0','predx_1','predx_2','predx_3','predx_4','predx_5','predx_6','predx_7','predx_8','predx_9','predx_10']
-traj_col = ['trajx_0','trajx_1','trajx_2','trajx_3','trajx_4','trajx_5','trajx_6','trajx_7','trajx_8','trajx_9','trajx_10']
-
 for rand_seed in range(100):
 
     df_pred = pd.read_csv('../results/Koscillators/miss_cos-/Koscillators_pred_{}.csv'.format(rand_seed))
     df_pred_p = pd.read_csv('../results/Koscillators/miss_cos-/Koscillators_pred_p_{}.csv'.format(rand_seed))
     df_pred_t = pd.read_csv('../results/Koscillators/miss_cos-/Koscillators_pred_t_{}.csv'.format(rand_seed))
+
+    df_network = pd.read_csv('../Koscillators/Koscillators_data/Koscillators_networkN_{}.csv'.format(rand_seed),header=None)
+
+    data_network = df_network.values
+
+    # the number of node
+    N = len(data_network)
+
+    pred_col = []
+    traj_col = []
+
+    for node in range(N):
+        pred_col.append('predx_{}'.format(node))
+        traj_col.append('trajx_{}'.format(node))
 
     t = np.linspace(0, 0 + (pred_length - 1) * 1, pred_length)
 

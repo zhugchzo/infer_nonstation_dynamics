@@ -1,105 +1,205 @@
 import pandas
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 from matplotlib import font_manager
-from matplotlib.ticker import MaxNLocator
 
-font_x = font_manager.FontProperties(family='Arial', size=24, weight='normal')
-font_y = font_manager.FontProperties(family='Arial', size=24, weight='normal')
-font_y1 = {'family':'Arial','weight':'normal','size': 14}
-font_title = {'family':'DejaVu Sans','weight':'light','size': 18, 'style': 'italic'}
+font_x = {'family':'Arial','weight':'normal','size': 20}
+font_y = {'family':'Arial','weight':'normal','size': 20}
+font_title = {'family':'DejaVu Sans','weight':'normal','size': 20, 'style': 'italic'}
 
 plt.rcParams['font.family'] = 'Arial'
 plt.rcParams['axes.labelweight'] = 'bold'
 
-df_tseries = pandas.read_csv('../fish/fish_data.csv')
+df_chick_150_tseries = pandas.read_csv('../chick/chick_data_150.csv')
+df_chick_150_pred_1 = pandas.read_csv('../results/chick/chick_150_pred_1.csv')
+df_chick_150_pred_2 = pandas.read_csv('../results/chick/chick_150_pred_2.csv')
+df_chick_150_gen = pandas.read_csv('../results/chick/chick_150_gen.csv')
 
-col = ['Aurelia.sp', 'Plotosus.japonicus', 'Sebastes.cheni', 'Trachurus.japonicus', 'Girella.punctata',
-       'Pseudolabrus.sieboldi', 'Parajulis.poecilopterus', 'Halichoeres.tenuispinnis', 'Chaenogobius.gulosus',
-       'Pterogobius.zonoleucus', 'Tridentiger.trigonocephalus', 'Siganus.fuscescens', 'Sphyraena.pinguis', 'Rudarius.ercodes']
+df_chick_270_tseries = pandas.read_csv('../chick/chick_data_270.csv')
+df_chick_270_pred_1 = pandas.read_csv('../results/chick/chick_270_pred_1.csv')
+df_chick_270_pred_2 = pandas.read_csv('../results/chick/chick_270_pred_2.csv')
+df_chick_270_gen = pandas.read_csv('../results/chick/chick_270_gen.csv')
 
-name = ['Jellyfish (Aurelia sp.)', 'Plotosus japonicus', 'Sebastes cheni', 'Trachurus japonicus', 'Girella punctata',
-       'Pseudolabrus sieboldi', 'Parajulis poecilopterus', 'Halichoeres tenuispinnis', 'Chaenogobius gulosus',
-       'Pterogobius zonoleucus', 'Tridentiger trigonocephalus', 'Siganus fuscescens', 'Sphyraena pinguis', 'Rudarius ercodes']
+df_chick_600_tseries = pandas.read_csv('../chick/chick_data_600.csv')
+df_chick_600_pred_1 = pandas.read_csv('../results/chick/chick_600_pred_1.csv')
+df_chick_600_pred_2 = pandas.read_csv('../results/chick/chick_600_pred_2.csv')
+df_chick_600_gen = pandas.read_csv('../results/chick/chick_600_gen.csv')
 
-# the number of node
-N = len(col)
+chick_150_train_length = 70
+chick_270_train_length = 150
+chick_600_train_length = 200
 
-data_tseries = df_tseries[col].values
-temperature_tseries = df_tseries['surf.t'].values
+fig, axs = plt.subplots(1, 3, figsize=(15,5.5))
 
-length = len(data_tseries)
-time = np.arange(1, 1 + length, 1)
+ax1, ax2, ax3 = axs[0], axs[1], axs[2]
 
-fig, axs = plt.subplots(4, 4, figsize=(18,12))
+# ax1
 
-cnt = 0
+chick_150_t1 = df_chick_150_tseries['Beat number']
+chick_150_t2 = df_chick_150_pred_1['Time']
+chick_150_t3 = df_chick_150_pred_2['Time']
 
-for i in range(4):
-    if i == 0:
-        for j in range(4):
-            if j < 2:
-                ax = axs[i, j]
-                ax.plot(time, data_tseries[:,cnt],c='black',zorder=2)
-                for count_y in range(6):
-                    ax.axvspan(time[14+48*count_y],time[14+48*count_y+23], color='silver', alpha=0.3, linewidth=0, zorder=1)
-                ax.yaxis.set_major_locator(MaxNLocator(nbins=4)) 
-                ax.set_title(name[cnt],fontdict=font_title)
-                ax.set_xticks([])
-                ax.tick_params(axis='y', labelsize=14)
-                cnt += 1
+ibi = df_chick_150_tseries['IBI (s)']
+train_ibi = df_chick_150_gen['gen'][:chick_150_train_length]
+pred_ibi_1 = df_chick_150_pred_1['pred']
+pred_ibi_2 = df_chick_150_pred_2['pred']
 
-            elif j == 2:
-                ax = axs[i, j]
-                ax.plot(time, temperature_tseries,c='royalblue',zorder=2)
-                for count_y in range(6):
-                    ax.axvspan(time[14+48*count_y],time[14+48*count_y+23], color='silver', alpha=0.3, linewidth=0, zorder=1)
-                ax.set_xticks([])
-                ax.set_ylabel('Temperature (\u00B0C)',font_y1)
+initial_t = chick_150_t1.iloc[0]
+end_t = chick_150_t1.iloc[-1]
+initial_theta = df_chick_150_gen['theta'].iloc[0] - (df_chick_150_gen['theta'].iloc[1] - df_chick_150_gen['theta'].iloc[0])
+end_theta =  initial_theta + (len(chick_150_t1) - 1) * (df_chick_150_gen['theta'].iloc[1] - df_chick_150_gen['theta'].iloc[0])
 
-                ax.yaxis.set_major_locator(MaxNLocator(nbins=4)) 
-                
-            elif j == 3:
-                ax = axs[i, j]
-                ax.axis('off')
+# period-2 bifurcation
 
-                legend_abundance = mlines.Line2D([], [], color='black', marker='none', linestyle='-', linewidth=2)
-                legend_temperature = mlines.Line2D([], [], color='royalblue', marker='none', linestyle='-', linewidth=2)
-                ax.legend(handles=[legend_abundance,legend_temperature],labels=['Abundance','Water temperature'],loc='center',frameon=False, handlelength=1, prop={'size':24})
+t_pd = initial_t + (0.935438-initial_theta)/(end_theta-initial_theta)*(end_t-initial_t)
+print('period-2 150:{}'.format(t_pd))
+df_chick_150_gen['distance'] = (df_chick_150_gen['Time'] - t_pd).abs()
+closest_row = df_chick_150_gen.loc[df_chick_150_gen['distance'].idxmin()]
+x_pd = closest_row['gen']
 
+ax1.plot(chick_150_t1[:chick_150_train_length],ibi[:chick_150_train_length],c='slategrey',linewidth=1,zorder=2)
+ax1.scatter(chick_150_t1[:chick_150_train_length],ibi[:chick_150_train_length],s=10,c='slategrey',marker='o',zorder=2)
+ax1.plot(chick_150_t1[chick_150_train_length:],ibi[chick_150_train_length:],c='black',linewidth=1,zorder=2)
+ax1.scatter(chick_150_t1[chick_150_train_length:],ibi[chick_150_train_length:],s=10,c='black',marker='o',zorder=2)
+ax1.scatter(chick_150_t2[::2],pred_ibi_1[::2],s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
+ax1.scatter(chick_150_t3,pred_ibi_2,s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
 
-    elif i == 3:
-        for j in range(4):
-            ax = axs[i, j]
-            ax.plot(time, data_tseries[:,cnt],c='black',zorder=2)
-            for count_y in range(6):
-                ax.axvspan(time[14+48*count_y],time[14+48*count_y+23], color='silver', alpha=0.3, linewidth=0, zorder=1)
-            ax.yaxis.set_major_locator(MaxNLocator(nbins=4))
-            ax.set_title(name[cnt],fontdict=font_title)
-            positions = [time[27], time[75], time[123], time[171], time[219], time[267]]
-            years = ['2003', '2005', '2007', '2009', '2011', '2013']
-            ax.set_xticks(positions)
-            ax.set_xticklabels(years, fontsize=14, fontfamily='Arial') 
-            ax.tick_params(axis='x', which='both', bottom=False)
-            ax.tick_params(axis='y', labelsize=14) 
-            cnt += 1        
+ax1.scatter(t_pd,x_pd,s=150, marker='h',facecolors='white', edgecolors='black',zorder=5)
 
-    else:
-        for j in range(4):
-            ax = axs[i, j]
-            ax.plot(time, data_tseries[:,cnt],c='black',zorder=2)
-            for count_y in range(6):
-                ax.axvspan(time[14+48*count_y],time[14+48*count_y+23], color='silver', alpha=0.3, linewidth=0, zorder=1)
-            ax.yaxis.set_major_locator(MaxNLocator(nbins=4))
-            ax.set_title(name[cnt],fontdict=font_title)
-            ax.set_xticks([])
-            ax.tick_params(axis='y', labelsize=14) 
-            cnt += 1
+ax1.set_xlabel('Beat number',font_x,labelpad=0)
+ax1.set_ylabel('IBI (s)',font_y,labelpad=-15)
+ax1.set_xlim(-10,160)
+ax1.set_xticks([0,70,150])
+ax1.set_ylim(0.3,1.1)
+ax1.set_yticks([0.4,1])
+ax1.set_yticklabels(['0.4','1'])
+ax1.tick_params(direction='in')
 
-fig.supxlabel('Year',x=0.535, y=0, fontproperties=font_x)
-fig.supylabel('Abundance',x=0.005, y=0.55, fontproperties=font_y)
+# ax1.yaxis.set_label_coords(-0.05, 0.48)
 
-plt.subplots_adjust(top=0.96, bottom=0.06, left=0.055, right=0.99, hspace=0.25, wspace=0.16)
+ax1.set_title('Beating chick-heart (IV)',y=1.02,fontdict=font_title)
+ax1.text(-0.125, 1,'A',ha='left', transform=ax1.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
+
+ax1.tick_params(axis='x', labelsize=18)
+ax1.tick_params(axis='y', labelsize=18)
+
+# ax2
+
+chick_270_t1 = df_chick_270_tseries['Beat number']
+chick_270_t2 = df_chick_270_pred_1['Time']
+chick_270_t3 = df_chick_270_pred_2['Time']
+
+ibi = df_chick_270_tseries['IBI (s)']
+train_ibi = df_chick_270_gen['gen'][:chick_270_train_length]
+pred_ibi_1 = df_chick_270_pred_1['pred']
+pred_ibi_2 = df_chick_270_pred_2['pred']
+
+initial_t = chick_270_t1.iloc[0]
+end_t = chick_270_t1.iloc[-1]
+initial_theta = df_chick_270_gen['theta'].iloc[0] - (df_chick_270_gen['theta'].iloc[1] - df_chick_270_gen['theta'].iloc[0])
+end_theta =  initial_theta + (len(chick_270_t1) - 1) * (df_chick_270_gen['theta'].iloc[1] - df_chick_270_gen['theta'].iloc[0])
+
+# period-2 bifurcation
+
+t_pd = initial_t + (0.119827-initial_theta)/(end_theta-initial_theta)*(end_t-initial_t)
+print('period-2 270:{}'.format(t_pd))
+df_chick_270_gen['distance'] = (df_chick_270_gen['Time'] - t_pd).abs()
+closest_row = df_chick_270_gen.loc[df_chick_270_gen['distance'].idxmin()]
+x_pd = closest_row['gen']
+
+ax2.plot(chick_270_t1[:chick_270_train_length],ibi[:chick_270_train_length],c='slategrey',linewidth=1,zorder=2)
+ax2.scatter(chick_270_t1[:chick_270_train_length],ibi[:chick_270_train_length],s=10,c='slategrey',marker='o',zorder=2)
+ax2.plot(chick_270_t1[chick_270_train_length:],ibi[chick_270_train_length:],c='black',linewidth=1,zorder=2)
+ax2.scatter(chick_270_t1[chick_270_train_length:],ibi[chick_270_train_length:],s=10,c='black',marker='o',zorder=2)
+ax2.scatter(chick_270_t2[::2],pred_ibi_1[::2],s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
+ax2.scatter(chick_270_t3,pred_ibi_2,s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
+
+ax2.scatter(t_pd,x_pd,s=150, marker='h',facecolors='white', edgecolors='black',zorder=5)
+
+ax2.set_xlabel('Beat number',font_x,labelpad=0)
+ax2.set_ylabel('IBI (s)',font_y,labelpad=-15)
+ax2.set_xlim(-13,283)
+ax2.set_xticks([0,150,270])
+ax2.set_ylim(0.3,1.8)
+ax2.set_yticks([0.4,1.7])
+ax2.set_yticklabels(['0.4','1.7'])
+ax2.tick_params(direction='in')
+
+# ax2.yaxis.set_label_coords(-0.05, 0.48)
+
+ax2.set_title('Beating chick-heart (V)',y=1.02,fontdict=font_title)
+ax2.text(-0.125, 1,'B',ha='left', transform=ax2.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
+
+ax2.tick_params(axis='x', labelsize=18)
+ax2.tick_params(axis='y', labelsize=18)
+
+# ax3
+
+chick_600_t1 = df_chick_600_tseries['Beat number']
+chick_600_t2 = df_chick_600_pred_1['Time']
+chick_600_t3 = df_chick_600_pred_2['Time']
+
+ibi = df_chick_600_tseries['IBI (s)']
+train_ibi = df_chick_600_gen['gen'][:chick_600_train_length]
+pred_ibi_1 = df_chick_600_pred_1['pred']
+pred_ibi_2 = df_chick_600_pred_2['pred']
+
+initial_t = chick_600_t1.iloc[0]
+end_t = chick_600_t1.iloc[-1]
+initial_theta = df_chick_600_gen['theta'].iloc[0] - (df_chick_600_gen['theta'].iloc[1] - df_chick_600_gen['theta'].iloc[0])
+end_theta =  initial_theta + (len(chick_600_t1) - 1) * (df_chick_600_gen['theta'].iloc[1] - df_chick_600_gen['theta'].iloc[0])
+
+# period-2 bifurcation
+
+t_pd = initial_t + (0.460545-initial_theta)/(end_theta-initial_theta)*(end_t-initial_t)
+print('period-2 600:{}'.format(t_pd))
+df_chick_600_gen['distance'] = (df_chick_600_gen['Time'] - t_pd).abs()
+closest_row = df_chick_600_gen.loc[df_chick_600_gen['distance'].idxmin()]
+x_pd = closest_row['gen']
+
+ax3.plot(chick_600_t1[:chick_600_train_length],ibi[:chick_600_train_length],c='slategrey',linewidth=1,zorder=2)
+ax3.scatter(chick_600_t1[:chick_600_train_length],ibi[:chick_600_train_length],s=10,c='slategrey',marker='o',zorder=2)
+ax3.plot(chick_600_t1[chick_600_train_length:],ibi[chick_600_train_length:],c='black',linewidth=1,zorder=2)
+ax3.scatter(chick_600_t1[chick_600_train_length:],ibi[chick_600_train_length:],s=10,c='black',marker='o',zorder=2)
+ax3.scatter(chick_600_t2[::2],pred_ibi_1[::2],s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
+ax3.scatter(chick_600_t3,pred_ibi_2,s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
+
+ax3.scatter(t_pd,x_pd,s=150, marker='h',facecolors='white', edgecolors='black',zorder=5)
+
+ax3.set_xlabel('Beat number',font_x,labelpad=0)
+ax3.set_ylabel('IBI (s)',font_y,labelpad=-15)
+ax3.set_xlim(-40,640)
+ax3.set_xticks([0,200,600])
+ax3.set_ylim(0.4,1.4)
+ax3.set_yticks([0.5,1.3])
+ax3.set_yticklabels(['0.5','1.3'])
+ax3.tick_params(direction='in')
+
+# ax3.yaxis.set_label_coords(-0.05, 0.48)
+
+ax3.set_title('Beating chick-heart (VI)',y=1.02,fontdict=font_title)
+ax3.text(-0.125, 1,'C',ha='left', transform=ax3.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
+
+ax3.tick_params(axis='x', labelsize=18)
+ax3.tick_params(axis='y', labelsize=18)
+
+legend_state = mlines.Line2D([], [], color='black', marker='o', markersize=3, linestyle='-', markeredgewidth=1.5)
+legend_train = mlines.Line2D([], [], color='slategrey', marker='o', markersize=3, linestyle='-', markeredgewidth=1.5)
+legend_pstate = mlines.Line2D([], [], markerfacecolor='none',color='crimson', marker='o', markersize=5, linestyle='None', markeredgewidth=1.5)
+legend_pd = mlines.Line2D([], [], markerfacecolor='white',color='black', marker='h', markersize=5, linestyle='None', markeredgewidth=1.5)
+
+fig.legend(handles=[legend_state,legend_train,legend_pstate,legend_pd],
+           labels=['Inter-beat intervals','Training data','Prediction','Predicted period-doubling bifurcation'],
+           loc='upper center', bbox_to_anchor=(0.5, 1.02), ncol=4, frameon=False, markerscale=2.5,
+           prop=font_manager.FontProperties(family='Arial Unicode MS', size=18))
+
+plt.subplots_adjust(top=0.8, bottom=0.1, left=0.04, right=0.99, wspace=0.2)
 plt.savefig('../figures/SFIG6.pdf',format='pdf')
 plt.savefig('/Users/zhugchzo/Desktop/3paper_fig/SFIG6.png',format='png',dpi=600)
+
+
+
+
+
+
+

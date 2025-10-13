@@ -26,11 +26,6 @@ dtot = dlin + dnonlin
 
 f_library = ['cte', 'x', 'p', 'sum_sin(xj-xi)', 'x^2', 'px', 'xsum_sin(xj-xi)', 'p^2', 'psum_sin(xj-xi)', 'sum_sin^2(xj-xi)']
 
-col_x = ['x0', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7', 'x8', 'x9', 'x10']
-
-# the number of node
-N = len(col_x)
-
 for rand_seed in range(100):
 
     # Load the saved data
@@ -38,6 +33,14 @@ for rand_seed in range(100):
     df_network = pd.read_csv('../Koscillators_data/Koscillators_network_{}.csv'.format(rand_seed),header=None)
 
     data_network = df_network.values
+
+    # the number of node
+    N = len(data_network)
+
+    col_x = []
+
+    for node in range(N):
+        col_x.append('x{}'.format(node))
 
     data_tseries = df_tseries[col_x].values
     t_series = df_tseries['t'].values

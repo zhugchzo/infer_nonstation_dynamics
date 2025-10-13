@@ -108,7 +108,7 @@ ax1.text(0.3,0.3,'Inferred equation :',fontdict={'family':'Arial','size':20,'wei
 ax1.text(-0.05,0.1,r'$\dot{x}=(1.4+0.4\nu)+(3.8-0.2\nu)x-x^3$',fontdict={'family':'Arial','size':20,'weight':'medium'})
 ax1.text(0.35,-0.05,r'$\nu:-1\rightarrow4$',fontdict={'family':'Arial','size':20,'weight':'medium'})
 
-ax1.text(-0.12, 1.02,'a',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':40,'weight':'bold'})
+ax1.text(-0.12, 1.02,'A',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':35,'weight':'bold'})
 
 # ax2
 heatmap = sns.heatmap(cusp_AIC, 
@@ -189,7 +189,7 @@ ax4.text(0.3,0.3,'Inferred equation :',fontdict={'family':'Arial','size':20,'wei
 ax4.text(-0.1,0.1,r'$\dot{\theta_i}=(0.0127+0.0202\nu)\sum_{j=1}^{N}A_{ij}\sin(\theta_j-\theta_i)$',fontdict={'family':'Arial','size':20,'weight':'medium'})
 ax4.text(0.35,-0.1,r'$\nu:-1\rightarrow49$',fontdict={'family':'Arial','size':20,'weight':'medium'})
 
-ax4.text(-0.12, 1.02,'b',ha='left', transform=ax4.transAxes,fontdict={'family':'Arial','size':40,'weight':'bold'})
+ax4.text(-0.12, 1.02,'B',ha='left', transform=ax4.transAxes,fontdict={'family':'Arial','size':35,'weight':'bold'})
 
 # ax5
 heatmap = sns.heatmap(Koscillators_AIC, 

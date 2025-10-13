@@ -31,11 +31,6 @@ f_library = ['cte', 'x', 'p', 'sin', 'x^2', 'px', 'xsin', 'p^2', 'psin', 'sin^2'
              'x^4', 'px^3', 'x^3sin', 'p^2x^2', 'px^2sin', 'x^2sin^2', 'p^3x', 'p^2xsin', 'pxsin^2', 'xsin^3', 'p^4', 'p^3sin', 'p^2sin^2', 'psin^3', 'sin^4',
              'x^5', 'px^4', 'x^4sin', 'p^2x^3', 'px^3sin', 'x^3sin^2', 'p^3x^2', 'p^2x^2sin', 'px^2sin^2', 'x^2sin^3', 'p^4x', 'p^3xsin', 'p^2xsin^2', 'pxsin^3', 'xsin^4', 'p^5', 'p^4sin', 'p^3sin^2', 'p^2sin^3', 'psin^4', 'sin^5']
 
-col_x = ['x0', 'x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7', 'x8', 'x9', 'x10']
-
-# the number of node
-N = len(col_x)
-
 for tl in [300, 350, 400, 450, 500]:
 
     if not os.path.exists('../../results/Koscillators/library5/{}'.format(tl)):
@@ -50,6 +45,14 @@ for tl in [300, 350, 400, 450, 500]:
         df_network = pd.read_csv('../Koscillators_data/Koscillators_network_{}.csv'.format(rand_seed),header=None)
 
         data_network = df_network.values
+
+        # the number of node
+        N = len(data_network)
+
+        col_x = []
+
+        for node in range(N):
+            col_x.append('x{}'.format(node))
 
         data_tseries = df_tseries[col_x].values
         t_series = df_tseries['t'].values
