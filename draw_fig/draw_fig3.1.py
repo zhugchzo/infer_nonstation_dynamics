@@ -83,7 +83,7 @@ ax1.set_ylabel('Inference inaccuracy (sMAPE)',font_y)
 ax1.yaxis.set_label_coords(-0.1, 0.45)
 
 ax1.set_title('500 data points',fontdict=font_title)
-ax1.text(-0.16, 1.05,'A',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':25,'weight':'bold'})
+ax1.text(-0.16, 1.05,'a',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 
 # ax2
 cusp_smape = df_cusp_smape_2[cusp_cols].to_numpy()
@@ -275,7 +275,7 @@ ax6.set_ylabel('Inference inaccuracy (sMAPE)',font_y)
 ax6.yaxis.set_label_coords(-0.1, 0.4)
 
 ax6.set_title('300 data points',fontdict=font_title)
-ax6.text(-0.16, 1.05,'B',ha='left', transform=ax6.transAxes,fontdict={'family':'Arial','size':25,'weight':'bold'})
+ax6.text(-0.16, 1.05,'b',ha='left', transform=ax6.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 
 # ax7
 Koscillators_smape = df_Koscillators_smape_2[Koscillators_cols].to_numpy()
@@ -445,5 +445,5 @@ fig.legend(handles = [legend_v, legend_p, legend_t],
 fig.supxlabel(r'Basis function library with degree $k$',x=0.5, y=0, fontproperties=font_x)
 
 plt.subplots_adjust(top=0.9, bottom=0.08, left=0.04, right=0.98, hspace=0.25, wspace=0.3)
-plt.savefig('../figures/FIG4.1.pdf',format='pdf')
-plt.savefig('/Users/zhugchzo/Desktop/3paper_fig/FIG4.1.png',format='png',dpi=600)
+plt.savefig('../figures/FIG3.1.pdf',format='pdf')
+plt.savefig('/Users/zhugchzo/Desktop/3paper_fig/FIG3.1.png',format='png',dpi=600)

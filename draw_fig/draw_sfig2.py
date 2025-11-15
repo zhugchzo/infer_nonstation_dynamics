@@ -110,7 +110,7 @@ for label in cbar.ax.get_yticklabels():
     label.set_fontsize(12)
 
 ax1.set_title(r'Grid search: $\nu_1=1,\,\Delta \nu=1\times10^{-3}$',fontdict=font_title, pad=5)
-ax1.text(-0.12, 1.16,'A',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':24,'weight':'bold'})
+ax1.text(-0.12, 1.16,'a',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 ax1.text(0.05, 1.14,'Cellular energy depletion',ha='left', transform=ax1.transAxes,color='royalblue',fontdict={'family':'DejaVu Sans','weight':'normal','size': 16, 'style': 'italic'})
 
 # ax2
@@ -144,8 +144,8 @@ for label in cbar.ax.get_yticklabels():
     label.set_fontsize(12)
 
 ax2.set_title(r'Grid search: $\nu_1=1,\,\Delta \nu=5\times10^{-3}$',fontdict=font_title, pad=5)
-ax2.text(-0.12, 1.16,'B',ha='left', transform=ax2.transAxes,fontdict={'family':'Arial','size':24,'weight':'bold'})
-ax2.text(0.1, 1.14,'UAV obstacle avoidance',ha='left', transform=ax2.transAxes,color='royalblue',fontdict={'family':'DejaVu Sans','weight':'normal','size': 16, 'style': 'italic'})
+ax2.text(-0.12, 1.16,'b',ha='left', transform=ax2.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
+ax2.text(0.1, 1.14,'UAV autonomous flight',ha='left', transform=ax2.transAxes,color='royalblue',fontdict={'family':'DejaVu Sans','weight':'normal','size': 16, 'style': 'italic'})
 
 # ax3
 heatmap = sns.heatmap(chick_220_AIC,
@@ -178,7 +178,7 @@ for label in cbar.ax.get_yticklabels():
     label.set_fontsize(12)
 
 ax3.set_title(r'Grid search: $\nu_1=0,\,\Delta \nu=5\times10^{-3}$',fontdict=font_title, pad=5)
-ax3.text(-0.12, 1.16,'C',ha='left', transform=ax3.transAxes,fontdict={'family':'Arial','size':24,'weight':'bold'})
+ax3.text(-0.12, 1.16,'c',ha='left', transform=ax3.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 ax3.text(0.1, 1.14,'Beating chick-heart (I)',ha='left', transform=ax3.transAxes,color='royalblue',fontdict={'family':'DejaVu Sans','weight':'normal','size': 16, 'style': 'italic'})
 
 # ax4
@@ -212,7 +212,7 @@ for label in cbar.ax.get_yticklabels():
     label.set_fontsize(12)
 
 ax4.set_title(r'Grid search: $\nu_1=-1,\,\Delta \nu=5\times10^{-3}$',fontdict=font_title, pad=5)
-ax4.text(-0.12, 1.16,'D',ha='left', transform=ax4.transAxes,fontdict={'family':'Arial','size':24,'weight':'bold'})
+ax4.text(-0.12, 1.16,'d',ha='left', transform=ax4.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 ax4.text(0.1, 1.14,'Beating chick-heart (II)',ha='left', transform=ax4.transAxes,color='royalblue',fontdict={'family':'DejaVu Sans','weight':'normal','size': 16, 'style': 'italic'})
 
 # ax5
@@ -246,7 +246,7 @@ for label in cbar.ax.get_yticklabels():
     label.set_fontsize(12)
 
 ax5.set_title(r'Grid search: $\nu_1=-1,\,\Delta \nu=1\times10^{-3}$',fontdict=font_title, pad=5)
-ax5.text(-0.12, 1.16,'E',ha='left', transform=ax5.transAxes,fontdict={'family':'Arial','size':24,'weight':'bold'})
+ax5.text(-0.12, 1.16,'e',ha='left', transform=ax5.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 ax5.text(0.1, 1.14,'Beating chick-heart (III)',ha='left', transform=ax5.transAxes,color='royalblue',fontdict={'family':'DejaVu Sans','weight':'normal','size': 16, 'style': 'italic'})
 
 # ax6
@@ -280,7 +280,7 @@ for label in cbar.ax.get_yticklabels():
     label.set_fontsize(12)
 
 ax6.set_title(r'Grid search: $\nu_1=0,\,\Delta \nu=1$',fontdict=font_title, pad=5)
-ax6.text(-0.12, 1.16,'F',ha='left', transform=ax6.transAxes,fontdict={'family':'Arial','size':24,'weight':'bold'})
+ax6.text(-0.12, 1.16,'f',ha='left', transform=ax6.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 ax6.text(0.2, 1.14,'Fish community',ha='left', transform=ax6.transAxes,color='royalblue',fontdict={'family':'DejaVu Sans','weight':'normal','size': 16, 'style': 'italic'})
 
 plt.subplots_adjust(top=0.96, bottom=0.03, left=0.04, right=0.98, hspace=0.2, wspace=0.3)

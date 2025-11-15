@@ -2,6 +2,26 @@ import pandas
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 from matplotlib import font_manager
+import matplotlib.patches as mpatches
+from matplotlib.legend_handler import HandlerBase
+
+class HandlerQuiver(HandlerBase):
+    def create_artists(self, legend, orig_handle,
+                       xdescent, ydescent, width, height, fontsize, trans):
+        qv = orig_handle
+        color = qv.get_facecolor()[0] if hasattr(qv, "get_facecolor") else 'chocolate'
+
+        arrow_length = width * 0.8    # 总长度（原 0.8）
+        arrow_thickness = height * 0.2  # 箭杆厚度（原 0.1）
+
+        patch = mpatches.FancyArrow(
+            width * 0.05, height * 0.5,   # 起点位置（略微下移）
+            arrow_length, 0,               # dx, dy
+            width=arrow_thickness,
+            color=color
+        )
+        return [patch]
+
 
 font_x = {'family':'Arial','weight':'normal','size': 20}
 font_y = {'family':'Arial','weight':'normal','size': 20}
@@ -16,6 +36,7 @@ df_mitochondria_gen = pandas.read_csv('../results/mitochondria/mitochondria_gen.
 
 df_UAV_tseries = pandas.read_csv('../UAV/UAV_data.csv')
 df_UAV_pred = pandas.read_csv('../results/UAV/UAV_pred.csv')
+df_UAV_acc = pandas.read_csv('../results/UAV/UAV_acc.csv')
 
 df_chick_220_tseries = pandas.read_csv('../chick/chick_data_220.csv')
 df_chick_220_pred_1 = pandas.read_csv('../results/chick/chick_220_pred_1.csv')
@@ -34,6 +55,7 @@ df_chick_335_gen = pandas.read_csv('../results/chick/chick_335_gen.csv')
 
 mitochondria_train_length = len(df_mitochondria_tseries) - len(df_mitochondria_pred) - 1
 UAV_train_length = len(df_UAV_tseries) - len(df_UAV_pred) - 1
+acc_length = len(df_UAV_acc)
 
 chick_train_length_1 = 150
 chick_train_length_2 = 200
@@ -47,7 +69,7 @@ ax5, ax6, ax7, ax8 = axs[1, 0], axs[1, 1], axs[1, 2], axs[1, 3]
 
 ax1.axis('off')
 ax1.set_title('Experiment illustration',x=0.4,y=0.9,fontdict=font_title)
-ax1.text(-0.125, 1.05,'A',ha='left', transform=ax1.transAxes,fontdict={'family':'DejaVu Sans','size':25,'weight':'bold'})
+ax1.text(-0.125, 1.05,'a',ha='left', transform=ax1.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
 
 # ax2
 
@@ -91,7 +113,7 @@ ax2.tick_params(direction='in')
 ax2.yaxis.set_label_coords(-0.1, 0.48)
 
 ax2.set_title('Cellular energy depletion',y=1.02,fontdict=font_title)
-ax2.text(-0.125, 1.05,'B',ha='left', transform=ax2.transAxes,fontdict={'family':'DejaVu Sans','size':25,'weight':'bold'})
+ax2.text(-0.125, 1.05,'b',ha='left', transform=ax2.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
 
 ax2.tick_params(axis='x', labelsize=18)
 ax2.tick_params(axis='y', labelsize=18)
@@ -100,7 +122,7 @@ ax2.tick_params(axis='y', labelsize=18)
 
 ax3.axis('off')
 ax3.set_title('Experiment illustration',x=0.45,y=0.9,fontdict=font_title)
-ax3.text(-0.125, 1.05,'C',ha='left', transform=ax3.transAxes,fontdict={'family':'DejaVu Sans','size':25,'weight':'bold'})
+ax3.text(-0.125, 1.05,'c',ha='left', transform=ax3.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
 
 # ax4
 
@@ -108,46 +130,89 @@ UAV_x = df_UAV_tseries['x']
 UAV_y = df_UAV_tseries['y']
 pred_UAV_x = df_UAV_pred['pred_x']
 pred_UAV_y = df_UAV_pred['pred_y']
+acc_x = df_UAV_acc['accx']
+acc_y = df_UAV_acc['accy']
 
 ax4.plot(UAV_x[:UAV_train_length][::4],UAV_y[:UAV_train_length][::4],c='slategrey',linewidth=1,zorder=2)
 ax4.scatter(UAV_x[:UAV_train_length][::4],UAV_y[:UAV_train_length][::4],s=10,c='slategrey',marker='o',zorder=2)
 ax4.plot(UAV_x[UAV_train_length:][::4],UAV_y[UAV_train_length:][::4],c='black',linewidth=1,zorder=2)
 ax4.scatter(UAV_x[UAV_train_length:][::4],UAV_y[UAV_train_length:][::4],s=10,c='black',marker='o',zorder=2)
-ax4.scatter(UAV_x.iloc[0], UAV_y.iloc[0], color='royalblue',s=180,zorder=4,marker=(5,1))  # Mark the start point
+# ax4.scatter(UAV_x.iloc[0], UAV_y.iloc[0], color='royalblue',s=180,zorder=4,marker=(5,1))  # Mark the start point
 ax4.scatter(pred_UAV_x[::4],pred_UAV_y[::4],s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
 
-ax4.annotate(
-    text='',
-    xy=(2.8, -0.18),
-    xytext=(1.5, -0.3),
-    arrowprops=dict(arrowstyle='->', color='black', lw=3)
-)
+for i in range(24,56,8):
+    ax4.quiver(UAV_x.iloc[i], UAV_y.iloc[i], acc_x.iloc[i], acc_y.iloc[i], color='chocolate', angles='xy', scale_units='xy', scale=1, headwidth=5, headlength=6, headaxislength=5, width=0.005, alpha=0.6)
+
+for i in range(72,184,8):
+    ax4.quiver(UAV_x.iloc[i], UAV_y.iloc[i], acc_x.iloc[i], acc_y.iloc[i], color='chocolate', angles='xy', scale_units='xy', scale=1, headwidth=5, headlength=6, headaxislength=5, width=0.005, alpha=0.6)
+
+for i in range(184,acc_length-16,8):
+    ax4.quiver(UAV_x.iloc[i], UAV_y.iloc[i], acc_x.iloc[i], acc_y.iloc[i], color='chocolate', angles='xy', scale_units='xy', scale=0.7, headwidth=5, headlength=6, headaxislength=5, width=0.005, alpha=0.6)
+
+ax4.quiver(UAV_x.iloc[0], UAV_y.iloc[0], acc_x.iloc[0], acc_y.iloc[0], color='chocolate', angles='xy', scale_units='xy', scale=1, headwidth=5, headlength=6, headaxislength=5, width=0.005, alpha=0.6)
+legend_arrow = ax4.quiver(UAV_x.iloc[-1], UAV_y.iloc[-1], acc_x.iloc[-1], acc_y.iloc[-1], color='chocolate', angles='xy', scale_units='xy', scale=0.7, headwidth=5, headlength=6, headaxislength=5, width=0.005, alpha=0.6)
 
 ax4.annotate(
     text='',
-    xy=(6.3, 1.6),
-    xytext=(5, 1.9),
-    arrowprops=dict(arrowstyle='->', color='black', lw=3)
+    xy=(0.8, -1.38),
+    xytext=(-0.5, -1.5),
+    arrowprops=dict(
+        arrowstyle='-|>',    
+        color='black',
+        lw=3,
+        mutation_scale=18    
+    )
 )
 
-ax4.annotate(
-    text='',
-    xy=(9.3, 0.5),
-    xytext=(8, 0.3),
-    arrowprops=dict(arrowstyle='->', color='black', lw=3)
+ax4.text(
+    x=1.2, y=-2,             
+    s='Initial velocity',       
+    fontsize=14,
+    color='black',
+    ha='center', va='top'      
 )
+
+ax4.text(
+    x=0, y=-0.1,             
+    s=r'$\text{P}_{\text{s}}$',       
+    fontsize=18,
+    color='black',
+    ha='center', va='top'      
+)
+
+ax4.text(
+    x=11, y=1,             
+    s=r'$\text{P}_{\text{g}}$',       
+    fontsize=18,
+    color='black',
+    ha='center', va='top'      
+)
+
+# ax4.annotate(
+#     text='',
+#     xy=(6.3, 1.6),
+#     xytext=(5, 1.9),
+#     arrowprops=dict(arrowstyle='->', color='black', lw=3)
+# )
+
+# ax4.annotate(
+#     text='',
+#     xy=(9.3, 0.5),
+#     xytext=(8, 0.3),
+#     arrowprops=dict(arrowstyle='->', color='black', lw=3)
+# )
 
 ax4.set_xlabel('X Position (m)',font_x,labelpad=-10)
 ax4.set_ylabel('Y Position (m)',font_y,labelpad=-15)
-ax4.set_xlim(-1,11.5)
+ax4.set_xlim(-0.8,11.7)
 ax4.set_xticks([0,10])
 # ax4.set_ylim(0.1,1.5)
 # ax4.set_yticks([0.2,1.4])
 ax4.set_ylim(-5.25,7.25)
 ax4.set_yticks([-4,6])
 
-ax4.set_title('UAV obstacle avoidance',y=1.02,fontdict=font_title)
-ax4.text(-0.125, 1.05,'D',ha='left', transform=ax4.transAxes,fontdict={'family':'DejaVu Sans','size':25,'weight':'bold'})
+ax4.set_title('UAV autonomous flight',y=1.02,fontdict=font_title)
+ax4.text(-0.125, 1.05,'d',ha='left', transform=ax4.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
 
 ax4.tick_params(axis='x', labelsize=18)
 ax4.tick_params(axis='y', labelsize=18)
@@ -157,7 +222,7 @@ ax4.tick_params(direction='in')
 
 ax5.axis('off')
 ax5.set_title('Experiment illustration',x=0.4,y=0.9,fontdict=font_title)
-ax5.text(-0.125, 1.05,'E',ha='left', transform=ax5.transAxes,fontdict={'family':'DejaVu Sans','size':25,'weight':'bold'})
+ax5.text(-0.125, 1.05,'e',ha='left', transform=ax5.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
 
 # ax6
 
@@ -204,7 +269,7 @@ ax6.tick_params(direction='in')
 # ax6.yaxis.set_label_coords(-0.05, 0.48)
 
 ax6.set_title('Beating chick-heart (I)',y=1.02,fontdict=font_title)
-ax6.text(-0.125, 1.05,'F',ha='left', transform=ax6.transAxes,fontdict={'family':'DejaVu Sans','size':25,'weight':'bold'})
+ax6.text(-0.125, 1.05,'f',ha='left', transform=ax6.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
 
 ax6.tick_params(axis='x', labelsize=18)
 ax6.tick_params(axis='y', labelsize=18)
@@ -254,7 +319,7 @@ ax7.tick_params(direction='in')
 # ax7.yaxis.set_label_coords(-0.05, 0.48)
 
 ax7.set_title('Beating chick-heart (II)',y=1.02,fontdict=font_title)
-ax7.text(-0.125, 1.05,'G',ha='left', transform=ax7.transAxes,fontdict={'family':'DejaVu Sans','size':25,'weight':'bold'})
+ax7.text(-0.125, 1.05,'g',ha='left', transform=ax7.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
 
 ax7.tick_params(axis='x', labelsize=18)
 ax7.tick_params(axis='y', labelsize=18)
@@ -304,58 +369,33 @@ ax8.tick_params(direction='in')
 # ax8.yaxis.set_label_coords(-0.05, 0.48)
 
 ax8.set_title('Beating chick-heart (III)',y=1.02,fontdict=font_title)
-ax8.text(-0.125, 1.05,'H',ha='left', transform=ax8.transAxes,fontdict={'family':'DejaVu Sans','size':25,'weight':'bold'})
+ax8.text(-0.125, 1.05,'h',ha='left', transform=ax8.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
 
 ax8.tick_params(axis='x', labelsize=18)
 ax8.tick_params(axis='y', labelsize=18)
 
-legend_state = mlines.Line2D([], [], color='black', marker='o', markersize=3, linestyle='-', markeredgewidth=1.5)
-legend_state_null = mlines.Line2D([0], [0], color='none')
-legend_train = mlines.Line2D([], [], color='slategrey', marker='o', markersize=3, linestyle='-', markeredgewidth=1.5)
-legend_pstate = mlines.Line2D([], [], markerfacecolor='none',color='crimson', marker='o', markersize=5, linestyle='None', markeredgewidth=1.5)
-legend_fold = mlines.Line2D([], [], markerfacecolor='white',color='black', marker='o', markersize=5, linestyle='None', markeredgewidth=1.5)
-legend_pd = mlines.Line2D([], [], markerfacecolor='white',color='black', marker='h', markersize=5, linestyle='None', markeredgewidth=1.5)
-legend_start = mlines.Line2D([], [], color='royalblue', marker=(5,1), markersize=6, linestyle='None', markeredgewidth=1.5)
-
-legend_1 = fig.legend(
-    handles=[legend_state,legend_state_null,legend_state_null,legend_state_null],
-    labels=['System state','(B) ATP concentration','(D) Odometry path','(F-H) Inter-beat intervals'],
-    loc='upper center',
-    bbox_to_anchor=(0.25, 1.01),
-    ncol=1,
-    frameon=False,
-    markerscale=2.5,
-    prop=font_manager.FontProperties(family='Arial Unicode MS', size=18)
-)
-
-legend_1.get_texts()[1].set_fontsize(15)
-legend_1.get_texts()[2].set_fontsize(15)
-legend_1.get_texts()[3].set_fontsize(15)
+legend_state = mlines.Line2D([], [], color='black', marker='o', markersize=4, linestyle='-', linewidth=2)
+legend_train = mlines.Line2D([], [], color='slategrey', marker='o', markersize=4, linestyle='-', linewidth=2)
+legend_pstate = mlines.Line2D([], [], markerfacecolor='none',color='crimson', marker='o', markersize=8, linestyle='None', markeredgewidth=1.5)
+legend_fold = mlines.Line2D([], [], markerfacecolor='white',color='black', marker='o', markersize=8, linestyle='None', markeredgewidth=1.5)
+legend_pd = mlines.Line2D([], [], markerfacecolor='white',color='black', marker='h', markersize=8, linestyle='None', markeredgewidth=1.5)
+#legend_start = mlines.Line2D([], [], color='royalblue', marker=(5,1), markersize=8, linestyle='None', markeredgewidth=1.5)
 
 fig.legend(
-    handles=[legend_train,legend_pstate,legend_fold,legend_pd],
-    labels=['Training data','Prediction','Predicted fold bifurcation','Predicted period-doubling bifurcation'],
+    handles=[legend_state,legend_pstate,legend_train,legend_fold,legend_arrow,legend_pd],
+    labels=['System state','Prediction','Training data','Predicted fold bifurcation',
+            'Calculated UAV horizontal thrust','Predicted period-doubling bifurcation'],
+    handler_map={type(legend_arrow): HandlerQuiver()},
     loc='upper center',
-    bbox_to_anchor=(0.5, 1.01),
-    ncol=1,
+    bbox_to_anchor=(0.55, 1),
+    ncol=3,
     frameon=False,
     markerscale=2.5,
-    prop=font_manager.FontProperties(family='Arial Unicode MS', size=18)
-)
-
-fig.legend(
-    handles=[legend_start],
-    labels=['Initial UAV position'],
-    loc='upper center',
-    bbox_to_anchor=(0.75, 1.01),
-    ncol=1,
-    frameon=False,
-    markerscale=2.5,
-    prop=font_manager.FontProperties(family='Arial Unicode MS', size=18)
+    prop=font_manager.FontProperties(family='Arial Unicode MS', size=22)
 )
 
 plt.subplots_adjust(top=0.8, bottom=0.05, left=0.05, right=0.99, hspace=0.3, wspace=0.2)
-plt.savefig('../figures/FIG5.0.pdf',format='pdf')
+plt.savefig('../figures/FIG4.0.pdf',format='pdf')
 
 
 

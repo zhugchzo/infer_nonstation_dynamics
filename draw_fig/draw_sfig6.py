@@ -78,7 +78,7 @@ ax1.tick_params(direction='in')
 # ax1.yaxis.set_label_coords(-0.05, 0.48)
 
 ax1.set_title('Beating chick-heart (IV)',y=1.02,fontdict=font_title)
-ax1.text(-0.125, 1,'A',ha='left', transform=ax1.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
+ax1.text(-0.125, 1.05,'a',ha='left', transform=ax1.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
 
 ax1.tick_params(axis='x', labelsize=18)
 ax1.tick_params(axis='y', labelsize=18)
@@ -128,7 +128,7 @@ ax2.tick_params(direction='in')
 # ax2.yaxis.set_label_coords(-0.05, 0.48)
 
 ax2.set_title('Beating chick-heart (V)',y=1.02,fontdict=font_title)
-ax2.text(-0.125, 1,'B',ha='left', transform=ax2.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
+ax2.text(-0.125, 1.05,'b',ha='left', transform=ax2.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
 
 ax2.tick_params(axis='x', labelsize=18)
 ax2.tick_params(axis='y', labelsize=18)
@@ -178,7 +178,7 @@ ax3.tick_params(direction='in')
 # ax3.yaxis.set_label_coords(-0.05, 0.48)
 
 ax3.set_title('Beating chick-heart (VI)',y=1.02,fontdict=font_title)
-ax3.text(-0.125, 1,'C',ha='left', transform=ax3.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
+ax3.text(-0.125, 1.05,'c',ha='left', transform=ax3.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
 
 ax3.tick_params(axis='x', labelsize=18)
 ax3.tick_params(axis='y', labelsize=18)

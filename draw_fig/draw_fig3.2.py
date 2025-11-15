@@ -50,7 +50,7 @@ ax1.tick_params(axis='y', direction='in')
 
 ax1.set_ylabel('Proportion of bifurcation',font_y)
 
-ax1.text(-0.15, 1.15,'C',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':25,'weight':'bold'})
+ax1.text(-0.15, 1.15,'c',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 
 # ax2 cusp bif errror
 
@@ -91,7 +91,7 @@ ax2.grid(False)
 ax2.set_ylabel('Bifurcation inaccuracy (timepoint)',font_y)
 ax2.yaxis.set_label_coords(-0.2, 0.5)
 
-ax2.text(-0.15, 1.15,'D',ha='left', transform=ax2.transAxes,fontdict={'family':'Arial','size':25,'weight':'bold'})
+ax2.text(-0.15, 1.15,'d',ha='left', transform=ax2.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 
 # ax3 cusp NED
 
@@ -132,7 +132,7 @@ ax3.grid(False)
 
 ax3.set_ylabel('Prediction inaccuracy (NED)',font_y)
 
-ax3.text(-0.15, 1.15,'E',ha='left', transform=ax3.transAxes,fontdict={'family':'Arial','size':25,'weight':'bold'})
+ax3.text(-0.15, 1.15,'e',ha='left', transform=ax3.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 
 # ax4 Koscillators sin+ NED
 
@@ -178,7 +178,7 @@ ax4.set_ylabel('Prediction inaccuracy (NED)',font_y)
 
 ax4.set_title(r'Interaction: $\sin(\theta_j+\theta_i)$',fontdict=font_title,y=1.1)
 
-ax4.text(-0.25, 1.15,'F',ha='left', transform=ax4.transAxes,fontdict={'family':'Arial','size':25,'weight':'bold'})
+ax4.text(-0.25, 1.15,'f',ha='left', transform=ax4.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 
 
 # ax5 Koscillators cos- NED
@@ -225,7 +225,7 @@ ax5.set_ylabel('Prediction inaccuracy (NED)',font_y)
 
 ax5.set_title(r'Interaction: $\cos(\theta_j-\theta_i)$',fontdict=font_title,y=1.1)
 
-ax5.text(-0.25, 1.15,'G',ha='left', transform=ax5.transAxes,fontdict={'family':'Arial','size':25,'weight':'bold'})
+ax5.text(-0.25, 1.15,'g',ha='left', transform=ax5.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 
 plt.subplots_adjust(top=0.6, bottom=0.1, left=0.05, right=0.98, wspace=0.35)
 
@@ -242,5 +242,5 @@ fig.text(0.8, 0.85, 'Kuramoto oscillators', ha='center', va='center',fontsize=25
 #               loc='upper center', bbox_to_anchor=(0.5,1), ncol=3, frameon=False, 
 #               prop=font_manager.FontProperties(family='Arial Unicode MS', size=20))
 
-plt.savefig('../figures/FIG4.2.pdf',format='pdf')
-plt.savefig('/Users/zhugchzo/Desktop/3paper_fig/FIG4.2.png',format='png',dpi=600)
+plt.savefig('../figures/FIG3.2.pdf',format='pdf')
+plt.savefig('/Users/zhugchzo/Desktop/3paper_fig/FIG3.2.png',format='png',dpi=600)

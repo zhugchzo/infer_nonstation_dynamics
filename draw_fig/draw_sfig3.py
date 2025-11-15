@@ -70,7 +70,7 @@ ax1.tick_params(direction='in')
 ax1.yaxis.set_label_coords(-0.1, 0.48)
 
 ax1.set_title('Cellular energy depletion',y=1.02,fontdict=font_title)
-ax1.text(-0.125, 1,'A',ha='left', transform=ax1.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
+ax1.text(-0.125, 1,'a',ha='left', transform=ax1.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
 
 ax1.tick_params(axis='x', labelsize=18)
 ax1.tick_params(axis='y', labelsize=18)
@@ -84,7 +84,7 @@ gen_UAV_y = df_UAV_gen['gen_y']
 
 ax2.plot(UAV_x,UAV_y,c='black',linewidth=1,zorder=2)
 ax2.scatter(UAV_x,UAV_y,s=10,c='black',marker='o',zorder=2)
-ax2.scatter(UAV_x.iloc[0], UAV_y.iloc[0], color='royalblue',s=180,zorder=4,marker=(5,1))  # Mark the start point
+# ax2.scatter(UAV_x.iloc[0], UAV_y.iloc[0], color='royalblue',s=180,zorder=4,marker=(5,1))  # Mark the start point
 ax2.scatter(gen_UAV_x[::4],gen_UAV_y[::4],s=50,marker='o',facecolors='none',edgecolors='darkorange',zorder=3)
 
 # ax2.annotate(
@@ -129,6 +129,22 @@ ax2.annotate(
     arrowprops=dict(arrowstyle='->', color='black', lw=3)
 )
 
+ax2.text(
+    x=0, y=-0.1,             
+    s=r'$\text{P}_{\text{s}}$',       
+    fontsize=18,
+    color='black',
+    ha='center', va='top'      
+)
+
+ax2.text(
+    x=11, y=1,             
+    s=r'$\text{P}_{\text{g}}$',       
+    fontsize=18,
+    color='black',
+    ha='center', va='top'      
+)
+
 ax2.set_xlabel('X Position (m)',font_x,labelpad=-5)
 ax2.set_ylabel('Y Position (m)',font_y,labelpad=-15)
 ax2.set_xlim(-1,11.5)
@@ -138,8 +154,8 @@ ax2.set_xticks([0,10])
 ax2.set_ylim(-5.25,7.25)
 ax2.set_yticks([-4,6])
 
-ax2.set_title('UAV obstacle avoidance',y=1.02,fontdict=font_title)
-ax2.text(-0.125, 1,'B',ha='left', transform=ax2.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
+ax2.set_title('UAV autonomous flight',y=1.02,fontdict=font_title)
+ax2.text(-0.125, 1,'b',ha='left', transform=ax2.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
 
 ax2.tick_params(axis='x', labelsize=18)
 ax2.tick_params(axis='y', labelsize=18)
@@ -153,11 +169,11 @@ legend_state_null = mlines.Line2D([0], [0], color='none')
 legend_pstate = mlines.Line2D([], [], markerfacecolor='none',color='darkorange', marker='o', markersize=5, linestyle='None', markeredgewidth=1.5)
 legend_fold = mlines.Line2D([], [], markerfacecolor='white',color='black', marker='o', markersize=5, linestyle='None', markeredgewidth=1.5)
 legend_pd = mlines.Line2D([], [], markerfacecolor='white',color='black', marker='h', markersize=5, linestyle='None', markeredgewidth=1.5)
-legend_start = mlines.Line2D([], [], color='royalblue', marker=(5,1), markersize=6, linestyle='None', markeredgewidth=1.5)
+# legend_start = mlines.Line2D([], [], color='royalblue', marker=(5,1), markersize=6, linestyle='None', markeredgewidth=1.5)
 
-legend = ax3.legend(handles=[legend_state,legend_state_null,legend_state_null,legend_state_null,legend_pstate,legend_fold,legend_pd,legend_start],
-           labels=['System state','(A) ATP concentration','(B) Odometry path','(C-E) Inter-beat intervals',
-                   'Generation','Predicted fold bifurcation','Predicted period-doubling bifurcation','Initial UAV position'],
+legend = ax3.legend(handles=[legend_state,legend_state_null,legend_state_null,legend_state_null,legend_pstate,legend_fold,legend_pd],
+           labels=['System state','(a) ATP concentration','(b) Odometry path','(c-e) Inter-beat intervals',
+                   'Generation','Predicted fold bifurcation','Predicted period-doubling bifurcation'],
                    loc='center',frameon=False, bbox_to_anchor=(0.45, 0.5), markerscale=2.5,prop={'size':18})
 
 legend.get_texts()[1].set_fontsize(15)
@@ -204,7 +220,7 @@ ax4.tick_params(direction='in')
 # ax4.yaxis.set_label_coords(-0.05, 0.48)
 
 ax4.set_title('Beating chick-heart (I)',y=1.02,fontdict=font_title)
-ax4.text(-0.125, 1,'C',ha='left', transform=ax4.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
+ax4.text(-0.125, 1,'c',ha='left', transform=ax4.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
 
 ax4.tick_params(axis='x', labelsize=18)
 ax4.tick_params(axis='y', labelsize=18)
@@ -249,7 +265,7 @@ ax5.tick_params(direction='in')
 # ax5.yaxis.set_label_coords(-0.05, 0.48)
 
 ax5.set_title('Beating chick-heart (II)',y=1.02,fontdict=font_title)
-ax5.text(-0.125, 1,'D',ha='left', transform=ax5.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
+ax5.text(-0.125, 1,'d',ha='left', transform=ax5.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
 
 ax5.tick_params(axis='x', labelsize=18)
 ax5.tick_params(axis='y', labelsize=18)
@@ -294,7 +310,7 @@ ax6.tick_params(direction='in')
 # ax6.yaxis.set_label_coords(-0.05, 0.48)
 
 ax6.set_title('Beating chick-heart (III)',y=1.02,fontdict=font_title)
-ax6.text(-0.125, 1,'E',ha='left', transform=ax6.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
+ax6.text(-0.125, 1,'e',ha='left', transform=ax6.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
 
 ax6.tick_params(axis='x', labelsize=18)
 ax6.tick_params(axis='y', labelsize=18)

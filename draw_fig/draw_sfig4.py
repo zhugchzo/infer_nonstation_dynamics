@@ -76,7 +76,7 @@ ax1.set_ylabel('Inference inaccuracy (NED)',font_y)
 ax1.yaxis.set_label_coords(-0.1, 0.45)
 
 ax1.set_title('Cellular energy depletion',fontdict=font_title)
-ax1.text(-0.18, 1,'A',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':22,'weight':'bold'})
+ax1.text(-0.22, 1.05,'a',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 
 # ax2
 UAV_gen_ned = df_UAV_gen_ned[['normal_Eucli_d']].values
@@ -109,8 +109,8 @@ ax2.tick_params(direction='in')
 ax2.set_xlabel('Timepoints',font_x)
 ax2.set_ylabel('Inference inaccuracy (NED)',font_y)
 ax2.yaxis.set_label_coords(-0.1, 0.45)
-ax2.set_title('UAV obstacle avoidance',fontdict=font_title)
-ax2.text(-0.18, 1,'B',ha='left', transform=ax2.transAxes,fontdict={'family':'Arial','size':22,'weight':'bold'})
+ax2.set_title('UAV autonomous flight',fontdict=font_title)
+ax2.text(-0.22, 1.05,'b',ha='left', transform=ax2.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 
 # ax3
 chick_220_gen_ned = df_chick_220_gen_ned[['normal_Eucli_d']].values
@@ -151,7 +151,7 @@ ax3.set_ylabel('Inference inaccuracy (NED)',font_y)
 ax3.yaxis.set_label_coords(-0.1, 0.45)
 
 ax3.set_title('Beating chick-heart (I)',fontdict=font_title)
-ax3.text(-0.18, 1,'C',ha='left', transform=ax3.transAxes,fontdict={'family':'Arial','size':22,'weight':'bold'})
+ax3.text(-0.22, 1.05,'c',ha='left', transform=ax3.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 
 # ax4
 chick_230_gen_ned = df_chick_230_gen_ned[['normal_Eucli_d']].values
@@ -192,7 +192,7 @@ ax4.set_ylabel('Inference inaccuracy (NED)',font_y)
 ax4.yaxis.set_label_coords(-0.1, 0.45)
 
 ax4.set_title('Beating chick-heart (II)',fontdict=font_title)
-ax4.text(-0.18, 1,'D',ha='left', transform=ax4.transAxes,fontdict={'family':'Arial','size':22,'weight':'bold'})
+ax4.text(-0.22, 1.05,'d',ha='left', transform=ax4.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 
 # ax5
 chick_335_gen_ned = df_chick_335_gen_ned[['normal_Eucli_d']].values
@@ -233,7 +233,7 @@ ax5.set_ylabel('Inference inaccuracy (NED)',font_y)
 ax5.yaxis.set_label_coords(-0.1, 0.45)
 
 ax5.set_title('Beating chick-heart (III)',fontdict=font_title)
-ax5.text(-0.18, 1,'E',ha='left', transform=ax5.transAxes,fontdict={'family':'Arial','size':22,'weight':'bold'})
+ax5.text(-0.22, 1.05,'e',ha='left', transform=ax5.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 
 # legend
 legend_v = mlines.Line2D([], [], color='cornflowerblue', marker='none', linestyle='-', linewidth=3,alpha=0.9)

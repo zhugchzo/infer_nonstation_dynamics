@@ -124,18 +124,18 @@ fig.supxlabel('Year',x=0.535, y=0.002, fontproperties=font_x)
 fig.supylabel('Abundance',x=0.004, y=0.21, fontproperties=font_y)
 
 fig.text(
-    0.02, 0.96, 'A',
+    0.02, 0.96, 'a',
     fontsize=40,
     fontfamily='Arial',
     fontweight='bold',
 )
 
 fig.text(
-    0.52, 0.96, 'B',
+    0.52, 0.96, 'b',
     fontsize=40,
     fontfamily='Arial',
     fontweight='bold',
 )
 
 plt.subplots_adjust(top=0.92, bottom=0.05, left=0.055, right=0.99, hspace=0.25, wspace=0.16)
-plt.savefig('../figures/FIG6.2.pdf',format='pdf')
+plt.savefig('../figures/FIG5.2.pdf',format='pdf')

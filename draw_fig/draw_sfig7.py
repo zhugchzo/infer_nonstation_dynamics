@@ -1,105 +1,41 @@
-import pandas
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.lines as mlines
-from matplotlib import font_manager
-from matplotlib.ticker import MaxNLocator
+from pypdf import PdfReader, PdfWriter
+from pypdf._page import PageObject
 
-font_x = font_manager.FontProperties(family='Arial', size=24, weight='normal')
-font_y = font_manager.FontProperties(family='Arial', size=24, weight='normal')
-font_y1 = {'family':'Arial','weight':'normal','size': 14}
-font_title = {'family':'DejaVu Sans','weight':'light','size': 18, 'style': 'italic'}
+# 读取两个 PDF
+doc1 = PdfReader("../figures/SFIG7.1.pdf")
+doc2 = PdfReader("../figures/SFIG7.2.pdf")
 
-plt.rcParams['font.family'] = 'Arial'
-plt.rcParams['axes.labelweight'] = 'bold'
+page1 = doc1.pages[0]
+page2 = doc2.pages[0]
 
-df_tseries = pandas.read_csv('../fish/fish_data.csv')
+# 获取页面宽高
+w1, h1 = page1.mediabox.width, page1.mediabox.height
+w2, h2 = page2.mediabox.width, page2.mediabox.height
 
-col = ['Aurelia.sp', 'Plotosus.japonicus', 'Sebastes.cheni', 'Trachurus.japonicus', 'Girella.punctata',
-       'Pseudolabrus.sieboldi', 'Parajulis.poecilopterus', 'Halichoeres.tenuispinnis', 'Chaenogobius.gulosus',
-       'Pterogobius.zonoleucus', 'Tridentiger.trigonocephalus', 'Siganus.fuscescens', 'Sphyraena.pinguis', 'Rudarius.ercodes']
+# 总宽度 = 最大宽度；总高度 = h1（上）+ h2（下）
+width = max(w1, w2)
+height = h1 + h2
 
-name = ['Jellyfish (Aurelia sp.)', 'Plotosus japonicus', 'Sebastes cheni', 'Trachurus japonicus', 'Girella punctata',
-       'Pseudolabrus sieboldi', 'Parajulis poecilopterus', 'Halichoeres tenuispinnis', 'Chaenogobius gulosus',
-       'Pterogobius zonoleucus', 'Tridentiger trigonocephalus', 'Siganus fuscescens', 'Sphyraena pinguis', 'Rudarius ercodes']
+# 创建一个新的空白页面
+new_page = PageObject.create_blank_page(width=width, height=height)
 
-# the number of node
-N = len(col)
+# 计算水平居中的偏移量
+tx1 = (width - w1) / 2
+tx2 = (width - w2) / 2
 
-data_tseries = df_tseries[col].values
-temperature_tseries = df_tseries['surf.t'].values
+# 把第1页放到顶部
+new_page.merge_translated_page(page1, tx=tx1, ty=h2)
 
-length = len(data_tseries)
-time = np.arange(1, 1 + length, 1)
+# 把第2页放到底部（水平居中）
+new_page.merge_translated_page(page2, tx=tx2, ty=0)
 
-fig, axs = plt.subplots(4, 4, figsize=(18,12))
+# 输出 PDF
+writer = PdfWriter()
+writer.add_page(new_page)
 
-cnt = 0
-
-for i in range(4):
-    if i == 0:
-        for j in range(4):
-            if j < 2:
-                ax = axs[i, j]
-                ax.plot(time, data_tseries[:,cnt],c='black',zorder=2)
-                for count_y in range(6):
-                    ax.axvspan(time[14+48*count_y],time[14+48*count_y+23], color='silver', alpha=0.3, linewidth=0, zorder=1)
-                ax.yaxis.set_major_locator(MaxNLocator(nbins=4)) 
-                ax.set_title(name[cnt],fontdict=font_title)
-                ax.set_xticks([])
-                ax.tick_params(axis='y', labelsize=14)
-                cnt += 1
-
-            elif j == 2:
-                ax = axs[i, j]
-                ax.plot(time, temperature_tseries,c='royalblue',zorder=2)
-                for count_y in range(6):
-                    ax.axvspan(time[14+48*count_y],time[14+48*count_y+23], color='silver', alpha=0.3, linewidth=0, zorder=1)
-                ax.set_xticks([])
-                ax.set_ylabel('Temperature (\u00B0C)',font_y1)
-
-                ax.yaxis.set_major_locator(MaxNLocator(nbins=4)) 
-                
-            elif j == 3:
-                ax = axs[i, j]
-                ax.axis('off')
-
-                legend_abundance = mlines.Line2D([], [], color='black', marker='none', linestyle='-', linewidth=2)
-                legend_temperature = mlines.Line2D([], [], color='royalblue', marker='none', linestyle='-', linewidth=2)
-                ax.legend(handles=[legend_abundance,legend_temperature],labels=['Abundance','Water temperature'],loc='center',frameon=False, handlelength=1, prop={'size':24})
+with open("../figures/SFIG7.pdf", "wb") as f:
+    writer.write(f)
 
 
-    elif i == 3:
-        for j in range(4):
-            ax = axs[i, j]
-            ax.plot(time, data_tseries[:,cnt],c='black',zorder=2)
-            for count_y in range(6):
-                ax.axvspan(time[14+48*count_y],time[14+48*count_y+23], color='silver', alpha=0.3, linewidth=0, zorder=1)
-            ax.yaxis.set_major_locator(MaxNLocator(nbins=4))
-            ax.set_title(name[cnt],fontdict=font_title)
-            positions = [time[27], time[75], time[123], time[171], time[219], time[267]]
-            years = ['2003', '2005', '2007', '2009', '2011', '2013']
-            ax.set_xticks(positions)
-            ax.set_xticklabels(years, fontsize=14, fontfamily='Arial') 
-            ax.tick_params(axis='x', which='both', bottom=False)
-            ax.tick_params(axis='y', labelsize=14) 
-            cnt += 1        
 
-    else:
-        for j in range(4):
-            ax = axs[i, j]
-            ax.plot(time, data_tseries[:,cnt],c='black',zorder=2)
-            for count_y in range(6):
-                ax.axvspan(time[14+48*count_y],time[14+48*count_y+23], color='silver', alpha=0.3, linewidth=0, zorder=1)
-            ax.yaxis.set_major_locator(MaxNLocator(nbins=4))
-            ax.set_title(name[cnt],fontdict=font_title)
-            ax.set_xticks([])
-            ax.tick_params(axis='y', labelsize=14) 
-            cnt += 1
 
-fig.supxlabel('Year',x=0.535, y=0, fontproperties=font_x)
-fig.supylabel('Abundance',x=0.005, y=0.55, fontproperties=font_y)
-
-plt.subplots_adjust(top=0.96, bottom=0.06, left=0.055, right=0.99, hspace=0.25, wspace=0.16)
-plt.savefig('../figures/SFIG7.pdf',format='pdf')
-plt.savefig('/Users/zhugchzo/Desktop/3paper_fig/SFIG7.png',format='png',dpi=600)

@@ -84,7 +84,7 @@ for i, node in enumerate(nodes):
         label_y = label_radius1 * np.sin(angle)
         ax1.text(label_x, label_y, name[i], fontsize=13, fontstyle='italic', fontfamily='DejaVu Sans', ha='center', va='center')
 
-ax1.text(-0.15, 0.96,'A',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':24,'weight':'bold'})
+ax1.text(-0.15, 0.96,'b',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 
 # ax2
 in_degree = np.sum(data_network == 1, axis=0)
@@ -102,7 +102,10 @@ ax2.tick_params(direction='in')
 ax2.set_xlabel('In-degree',font_x)
 ax2.set_ylabel('Frequency',font_y,labelpad=15)
 
-ax2.text(-0.15, 0.96,'B',ha='left', transform=ax2.transAxes,fontdict={'family':'Arial','size':24,'weight':'bold'})
+ax2.spines['right'].set_visible(False)
+ax2.spines['top'].set_visible(False)
+
+ax2.text(-0.15, 0.96,'c',ha='left', transform=ax2.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 
 # ax3
 in_degree = np.sum(data_network == 1, axis=1)
@@ -120,8 +123,11 @@ ax3.tick_params(direction='in')
 ax3.set_xlabel('Out-degree',font_x)
 ax3.set_ylabel('Frequency',font_y,labelpad=15)
 
-ax3.text(-0.15, 0.96,'C',ha='left', transform=ax3.transAxes,fontdict={'family':'Arial','size':24,'weight':'bold'})
+ax3.spines['right'].set_visible(False)
+ax3.spines['top'].set_visible(False)
 
-plt.subplots_adjust(top=0.96, bottom=0.15, left=0.04, right=0.98, hspace=0.25, wspace=0.3)
-plt.savefig('../figures/SFIG8.pdf',format='pdf')
-plt.savefig('/Users/zhugchzo/Desktop/3paper_fig/SFIG8.png',format='png',dpi=600)
+ax3.text(-0.15, 0.96,'d',ha='left', transform=ax3.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
+
+plt.subplots_adjust(top=0.9, bottom=0.15, left=0.04, right=0.98, hspace=0.25, wspace=0.3)
+plt.savefig('../figures/SFIG7.2.pdf',format='pdf')
+plt.savefig('/Users/zhugchzo/Desktop/3paper_fig/SFIG7.2.png',format='png',dpi=600)
