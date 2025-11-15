@@ -22,7 +22,7 @@ within a new virtual environment.
 
 **./mitochondria:** Code to apply our method to infer the equation and predict dynamics for the cellular system, and to use AUTO-07P to identify bifurcation of the inferred equation.
 
-**./UAV:** Code to apply our method to infer the equations and predict dynamics for the UAV navigation system.
+**./UAV:** Code to apply our method to infer the equations, calculate the acceleration of the UAV, and predict dynamics for the UAV navigation system.
 
 **./chick:** Code to apply our method to infer the quation and predict dynamics for the physiological system, and to use AUTO-07P to identify bifurcation of the inferred equation.
 
