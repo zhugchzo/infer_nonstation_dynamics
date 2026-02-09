@@ -1,41 +1,197 @@
-from pypdf import PdfReader, PdfWriter
-from pypdf._page import PageObject
+import pandas
+import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
+from matplotlib import font_manager
 
-# 读取两个 PDF
-doc1 = PdfReader("../figures/SFIG7.1.pdf")
-doc2 = PdfReader("../figures/SFIG7.2.pdf")
+font_x = {'family':'Arial','weight':'normal','size': 20}
+font_y = {'family':'Arial','weight':'normal','size': 20}
+font_title = {'family':'DejaVu Sans','weight':'normal','size': 20, 'style': 'italic'}
 
-page1 = doc1.pages[0]
-page2 = doc2.pages[0]
+plt.rcParams['font.family'] = 'Arial'
+plt.rcParams['axes.labelweight'] = 'bold'
 
-# 获取页面宽高
-w1, h1 = page1.mediabox.width, page1.mediabox.height
-w2, h2 = page2.mediabox.width, page2.mediabox.height
+df_chick_150_tseries = pandas.read_csv('../chick/chick_data_150.csv')
+df_chick_150_pred_1 = pandas.read_csv('../results/chick/chick_150_pred_1.csv')
+df_chick_150_pred_2 = pandas.read_csv('../results/chick/chick_150_pred_2.csv')
+df_chick_150_gen = pandas.read_csv('../results/chick/chick_150_gen.csv')
 
-# 总宽度 = 最大宽度；总高度 = h1（上）+ h2（下）
-width = max(w1, w2)
-height = h1 + h2
+df_chick_270_tseries = pandas.read_csv('../chick/chick_data_270.csv')
+df_chick_270_pred_1 = pandas.read_csv('../results/chick/chick_270_pred_1.csv')
+df_chick_270_pred_2 = pandas.read_csv('../results/chick/chick_270_pred_2.csv')
+df_chick_270_gen = pandas.read_csv('../results/chick/chick_270_gen.csv')
 
-# 创建一个新的空白页面
-new_page = PageObject.create_blank_page(width=width, height=height)
+df_chick_600_tseries = pandas.read_csv('../chick/chick_data_600.csv')
+df_chick_600_pred_1 = pandas.read_csv('../results/chick/chick_600_pred_1.csv')
+df_chick_600_pred_2 = pandas.read_csv('../results/chick/chick_600_pred_2.csv')
+df_chick_600_gen = pandas.read_csv('../results/chick/chick_600_gen.csv')
 
-# 计算水平居中的偏移量
-tx1 = (width - w1) / 2
-tx2 = (width - w2) / 2
+chick_150_train_length = 70
+chick_270_train_length = 150
+chick_600_train_length = 200
 
-# 把第1页放到顶部
-new_page.merge_translated_page(page1, tx=tx1, ty=h2)
+fig, axs = plt.subplots(1, 3, figsize=(15,5.5))
 
-# 把第2页放到底部（水平居中）
-new_page.merge_translated_page(page2, tx=tx2, ty=0)
+ax1, ax2, ax3 = axs[0], axs[1], axs[2]
 
-# 输出 PDF
-writer = PdfWriter()
-writer.add_page(new_page)
+# ax1
 
-with open("../figures/SFIG7.pdf", "wb") as f:
-    writer.write(f)
+chick_150_t1 = df_chick_150_tseries['Beat number']
+chick_150_t2 = df_chick_150_pred_1['Time']
+chick_150_t3 = df_chick_150_pred_2['Time']
 
+ibi = df_chick_150_tseries['IBI (s)']
+train_ibi = df_chick_150_gen['gen'][:chick_150_train_length]
+pred_ibi_1 = df_chick_150_pred_1['pred']
+pred_ibi_2 = df_chick_150_pred_2['pred']
 
+initial_t = chick_150_t1.iloc[0]
+end_t = chick_150_t1.iloc[-1]
+initial_theta = df_chick_150_gen['theta'].iloc[0] - (df_chick_150_gen['theta'].iloc[1] - df_chick_150_gen['theta'].iloc[0])
+end_theta =  initial_theta + (len(chick_150_t1) - 1) * (df_chick_150_gen['theta'].iloc[1] - df_chick_150_gen['theta'].iloc[0])
 
+# period-2 bifurcation
 
+t_pd = initial_t + (0.935438-initial_theta)/(end_theta-initial_theta)*(end_t-initial_t)
+print('period-2 150:{}'.format(t_pd))
+df_chick_150_gen['distance'] = (df_chick_150_gen['Time'] - t_pd).abs()
+closest_row = df_chick_150_gen.loc[df_chick_150_gen['distance'].idxmin()]
+x_pd = closest_row['gen']
+
+ax1.plot(chick_150_t1[:chick_150_train_length],ibi[:chick_150_train_length],c='slategrey',linewidth=1,zorder=2)
+ax1.scatter(chick_150_t1[:chick_150_train_length],ibi[:chick_150_train_length],s=10,c='slategrey',marker='o',zorder=2)
+ax1.plot(chick_150_t1[chick_150_train_length:],ibi[chick_150_train_length:],c='black',linewidth=1,zorder=2)
+ax1.scatter(chick_150_t1[chick_150_train_length:],ibi[chick_150_train_length:],s=10,c='black',marker='o',zorder=2)
+ax1.scatter(chick_150_t2[::2],pred_ibi_1[::2],s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
+ax1.scatter(chick_150_t3,pred_ibi_2,s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
+
+ax1.scatter(t_pd,x_pd,s=150, marker='h',facecolors='white', edgecolors='black',zorder=5)
+
+ax1.set_xlabel('Beat number',font_x,labelpad=0)
+ax1.set_ylabel('IBI (s)',font_y,labelpad=-15)
+ax1.set_xlim(-10,160)
+ax1.set_xticks([0,70,150])
+ax1.set_ylim(0.3,1.1)
+ax1.set_yticks([0.4,1])
+ax1.set_yticklabels(['0.4','1'])
+ax1.tick_params(direction='in')
+
+# ax1.yaxis.set_label_coords(-0.05, 0.48)
+
+ax1.set_title('Beating chick-heart (IV)',y=1.02,fontdict=font_title)
+ax1.text(-0.125, 1.05,'a',ha='left', transform=ax1.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
+
+ax1.tick_params(axis='x', labelsize=18)
+ax1.tick_params(axis='y', labelsize=18)
+
+# ax2
+
+chick_270_t1 = df_chick_270_tseries['Beat number']
+chick_270_t2 = df_chick_270_pred_1['Time']
+chick_270_t3 = df_chick_270_pred_2['Time']
+
+ibi = df_chick_270_tseries['IBI (s)']
+train_ibi = df_chick_270_gen['gen'][:chick_270_train_length]
+pred_ibi_1 = df_chick_270_pred_1['pred']
+pred_ibi_2 = df_chick_270_pred_2['pred']
+
+initial_t = chick_270_t1.iloc[0]
+end_t = chick_270_t1.iloc[-1]
+initial_theta = df_chick_270_gen['theta'].iloc[0] - (df_chick_270_gen['theta'].iloc[1] - df_chick_270_gen['theta'].iloc[0])
+end_theta =  initial_theta + (len(chick_270_t1) - 1) * (df_chick_270_gen['theta'].iloc[1] - df_chick_270_gen['theta'].iloc[0])
+
+# period-2 bifurcation
+
+t_pd = initial_t + (0.119827-initial_theta)/(end_theta-initial_theta)*(end_t-initial_t)
+print('period-2 270:{}'.format(t_pd))
+df_chick_270_gen['distance'] = (df_chick_270_gen['Time'] - t_pd).abs()
+closest_row = df_chick_270_gen.loc[df_chick_270_gen['distance'].idxmin()]
+x_pd = closest_row['gen']
+
+ax2.plot(chick_270_t1[:chick_270_train_length],ibi[:chick_270_train_length],c='slategrey',linewidth=1,zorder=2)
+ax2.scatter(chick_270_t1[:chick_270_train_length],ibi[:chick_270_train_length],s=10,c='slategrey',marker='o',zorder=2)
+ax2.plot(chick_270_t1[chick_270_train_length:],ibi[chick_270_train_length:],c='black',linewidth=1,zorder=2)
+ax2.scatter(chick_270_t1[chick_270_train_length:],ibi[chick_270_train_length:],s=10,c='black',marker='o',zorder=2)
+ax2.scatter(chick_270_t2[::2],pred_ibi_1[::2],s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
+ax2.scatter(chick_270_t3,pred_ibi_2,s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
+
+ax2.scatter(t_pd,x_pd,s=150, marker='h',facecolors='white', edgecolors='black',zorder=5)
+
+ax2.set_xlabel('Beat number',font_x,labelpad=0)
+ax2.set_ylabel('IBI (s)',font_y,labelpad=-15)
+ax2.set_xlim(-13,283)
+ax2.set_xticks([0,150,270])
+ax2.set_ylim(0.3,1.8)
+ax2.set_yticks([0.4,1.7])
+ax2.set_yticklabels(['0.4','1.7'])
+ax2.tick_params(direction='in')
+
+# ax2.yaxis.set_label_coords(-0.05, 0.48)
+
+ax2.set_title('Beating chick-heart (V)',y=1.02,fontdict=font_title)
+ax2.text(-0.125, 1.05,'b',ha='left', transform=ax2.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
+
+ax2.tick_params(axis='x', labelsize=18)
+ax2.tick_params(axis='y', labelsize=18)
+
+# ax3
+
+chick_600_t1 = df_chick_600_tseries['Beat number']
+chick_600_t2 = df_chick_600_pred_1['Time']
+chick_600_t3 = df_chick_600_pred_2['Time']
+
+ibi = df_chick_600_tseries['IBI (s)']
+train_ibi = df_chick_600_gen['gen'][:chick_600_train_length]
+pred_ibi_1 = df_chick_600_pred_1['pred']
+pred_ibi_2 = df_chick_600_pred_2['pred']
+
+initial_t = chick_600_t1.iloc[0]
+end_t = chick_600_t1.iloc[-1]
+initial_theta = df_chick_600_gen['theta'].iloc[0] - (df_chick_600_gen['theta'].iloc[1] - df_chick_600_gen['theta'].iloc[0])
+end_theta =  initial_theta + (len(chick_600_t1) - 1) * (df_chick_600_gen['theta'].iloc[1] - df_chick_600_gen['theta'].iloc[0])
+
+# period-2 bifurcation
+
+t_pd = initial_t + (0.460545-initial_theta)/(end_theta-initial_theta)*(end_t-initial_t)
+print('period-2 600:{}'.format(t_pd))
+df_chick_600_gen['distance'] = (df_chick_600_gen['Time'] - t_pd).abs()
+closest_row = df_chick_600_gen.loc[df_chick_600_gen['distance'].idxmin()]
+x_pd = closest_row['gen']
+
+ax3.plot(chick_600_t1[:chick_600_train_length],ibi[:chick_600_train_length],c='slategrey',linewidth=1,zorder=2)
+ax3.scatter(chick_600_t1[:chick_600_train_length],ibi[:chick_600_train_length],s=10,c='slategrey',marker='o',zorder=2)
+ax3.plot(chick_600_t1[chick_600_train_length:],ibi[chick_600_train_length:],c='black',linewidth=1,zorder=2)
+ax3.scatter(chick_600_t1[chick_600_train_length:],ibi[chick_600_train_length:],s=10,c='black',marker='o',zorder=2)
+ax3.scatter(chick_600_t2[::2],pred_ibi_1[::2],s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
+ax3.scatter(chick_600_t3,pred_ibi_2,s=50,marker='o',facecolors='none',edgecolors='crimson',zorder=3)
+
+ax3.scatter(t_pd,x_pd,s=150, marker='h',facecolors='white', edgecolors='black',zorder=5)
+
+ax3.set_xlabel('Beat number',font_x,labelpad=0)
+ax3.set_ylabel('IBI (s)',font_y,labelpad=-15)
+ax3.set_xlim(-40,640)
+ax3.set_xticks([0,200,600])
+ax3.set_ylim(0.4,1.4)
+ax3.set_yticks([0.5,1.3])
+ax3.set_yticklabels(['0.5','1.3'])
+ax3.tick_params(direction='in')
+
+# ax3.yaxis.set_label_coords(-0.05, 0.48)
+
+ax3.set_title('Beating chick-heart (VI)',y=1.02,fontdict=font_title)
+ax3.text(-0.125, 1.05,'c',ha='left', transform=ax3.transAxes,fontdict={'family':'DejaVu Sans','size':30,'weight':'bold'})
+
+ax3.tick_params(axis='x', labelsize=18)
+ax3.tick_params(axis='y', labelsize=18)
+
+legend_state = mlines.Line2D([], [], color='black', marker='o', markersize=3, linestyle='-', markeredgewidth=1.5)
+legend_train = mlines.Line2D([], [], color='slategrey', marker='o', markersize=3, linestyle='-', markeredgewidth=1.5)
+legend_pstate = mlines.Line2D([], [], markerfacecolor='none',color='crimson', marker='o', markersize=5, linestyle='None', markeredgewidth=1.5)
+legend_pd = mlines.Line2D([], [], markerfacecolor='white',color='black', marker='h', markersize=5, linestyle='None', markeredgewidth=1.5)
+
+fig.legend(handles=[legend_state,legend_train,legend_pstate,legend_pd],
+           labels=['Inter-beat intervals','Training data','Prediction','Predicted period-doubling bifurcation'],
+           loc='upper center', bbox_to_anchor=(0.5, 1.02), ncol=4, frameon=False, markerscale=2.5,
+           prop=font_manager.FontProperties(family='Arial Unicode MS', size=18))
+
+plt.subplots_adjust(top=0.8, bottom=0.1, left=0.04, right=0.99, wspace=0.2)
+plt.savefig('../figures/SFIG7.pdf',format='pdf')

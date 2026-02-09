@@ -213,12 +213,14 @@ smape_out.to_csv('../results/sMAPE/Koscillators_smape.csv',header = True, index=
 means_length = np.mean(smape_matrix[:,10:], axis=1)
 means_length_p = np.mean(smape_matrix_p[:,10:], axis=1)
 means_length_t = np.mean(smape_matrix_t[:,10:], axis=1)
+means_length_AIC = np.mean(smape_matrix_AIC[:,10:], axis=1)
 
 df_size_smape = pd.DataFrame({
     'network_size': network_size_list,
     'mean_smape': means_length,
     'mean_smape_p': means_length_p,
-    'mean_smape_t': means_length_t
+    'mean_smape_t': means_length_t,
+    'mean_smape_AIC': means_length_AIC
 })
 
 g = df_size_smape.groupby('network_size').agg(
@@ -228,6 +230,8 @@ g = df_size_smape.groupby('network_size').agg(
     std_smape_p = ('mean_smape_p', 'std'),
     mean_smape_t = ('mean_smape_t', 'mean'),
     std_smape_t = ('mean_smape_t', 'std'),
+    mean_smape_AIC = ('mean_smape_AIC', 'mean'),
+    std_smape_AIC = ('mean_smape_AIC', 'std'),
     n = ('mean_smape', 'size')
 )
 
@@ -249,6 +253,11 @@ half_width_t = t_crit * se_t
 size_ci_lower_t = np.where(g['n'] > 1, g['mean_smape_t'] - half_width, g['mean_smape_t'])
 size_ci_upper_t = np.where(g['n'] > 1, g['mean_smape_t'] + half_width, g['mean_smape_t'])
 
+se_AIC = g['std_smape_AIC'] / np.sqrt(g['n'])
+half_width_AIC = t_crit * se_AIC
+size_ci_lower_AIC = np.where(g['n'] > 1, g['mean_smape_AIC'] - half_width, g['mean_smape_AIC'])
+size_ci_upper_AIC = np.where(g['n'] > 1, g['mean_smape_AIC'] + half_width, g['mean_smape_AIC'])
+
 size_smape_out = (
     pd.DataFrame({
         'network_size': g.index,
@@ -260,7 +269,10 @@ size_smape_out = (
         'upper_smape_p': size_ci_upper_p,
         'mean_smape_t': g['mean_smape_t'].values,
         'lower_smape_t': size_ci_lower_t,
-        'upper_smape_t': size_ci_upper_t
+        'upper_smape_t': size_ci_upper_t,
+        'mean_smape_AIC': g['mean_smape_AIC'].values,
+        'lower_smape_AIC': size_ci_lower_AIC,
+        'upper_smape_AIC': size_ci_upper_AIC
     })
     .sort_values('network_size')
     .reset_index(drop=True)

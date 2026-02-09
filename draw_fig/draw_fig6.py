@@ -411,7 +411,3 @@ plt.subplots_adjust(top=0.86, bottom=0.05, left=0.04, right=0.98, hspace=0.23, w
 plt.savefig('../figures/FIG6.pdf',format='pdf')
 plt.savefig('/Users/zhugchzo/Desktop/3paper_fig/FIG6.png',format='png',dpi=600)
 # plt.show()
-
-
-
-

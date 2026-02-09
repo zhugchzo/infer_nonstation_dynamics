@@ -68,6 +68,4 @@ legend_var = mlines.Line2D([], [], color='crimson', marker='none', linestyle='--
 ax1.legend(handles=[legend_dom_eval,legend_var],labels=['Modulus of the \ndominant eigenvalue','Variance'],loc='center',frameon=False,bbox_to_anchor=(0.85, 0.9), prop={'size':15})
 
 plt.subplots_adjust(top=0.98, bottom=0.14, left=0.07, right=0.9)
-plt.savefig('../figures/SFIG8.pdf',format='pdf')
-plt.savefig('/Users/zhugchzo/Desktop/3paper_fig/SFIG8.png',format='png',dpi=600)
-
+plt.savefig('../figures/SFIG9.pdf',format='pdf')

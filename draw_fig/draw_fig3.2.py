@@ -48,7 +48,7 @@ ax1.set_yticks([0,1])
 ax1.tick_params(axis='x', direction='out')
 ax1.tick_params(axis='y', direction='in')
 
-ax1.set_ylabel('Proportion of bifurcation',font_y)
+ax1.set_ylabel('Bifurcation detection rate',font_y)
 
 ax1.text(-0.15, 1.15,'c',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 

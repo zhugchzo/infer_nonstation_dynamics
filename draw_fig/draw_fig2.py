@@ -282,7 +282,7 @@ ax8.spines['top'].set_visible(False)
 ax8.text(-0.12, 1.1,'f',ha='left', transform=ax8.transAxes,fontdict={'family':'Arial','size':35,'weight':'bold'})
 
 arrow1 = FancyArrow(
-    0.395, 0.22,       # 起点 (x, y) in figure coords
+    0.4, 0.22,       # 起点 (x, y) in figure coords
     0, 0.015,        # dx, dy
     width=0.007,
     color='silver',
@@ -293,7 +293,7 @@ arrow1 = FancyArrow(
 fig.patches.append(arrow1)
 
 arrow2 = FancyArrow(
-    0.395, 0.22,    
+    0.4, 0.22,    
     0, -0.015,       
     width=0.007,
     color='silver',
@@ -304,7 +304,7 @@ arrow2 = FancyArrow(
 fig.patches.append(arrow2)
 
 arrow3 = FancyArrow(
-    0.395, 0.75,       # 起点 (x, y) in figure coords
+    0.4, 0.75,       # 起点 (x, y) in figure coords
     0, 0.015,        # dx, dy
     width=0.007,
     color='silver',
@@ -315,7 +315,7 @@ arrow3 = FancyArrow(
 fig.patches.append(arrow3)
 
 arrow4 = FancyArrow(
-    0.395, 0.75,    
+    0.4, 0.75,    
     0, -0.015,       
     width=0.007,
     color='silver',
@@ -325,7 +325,7 @@ arrow4 = FancyArrow(
 )
 fig.patches.append(arrow4)
 
-plt.subplots_adjust(top=0.92, bottom=0.06, left=0.04, right=0.98, hspace=0.5, wspace=0.3)
+plt.subplots_adjust(top=0.92, bottom=0.06, left=0.04, right=1, hspace=0.5, wspace=0.3)
 plt.savefig('../figures/FIG2.pdf',format='pdf')
 plt.savefig('/Users/zhugchzo/Desktop/3paper_fig/FIG2.png',format='png',dpi=600)
 

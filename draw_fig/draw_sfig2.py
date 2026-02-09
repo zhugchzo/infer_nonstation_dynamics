@@ -1,288 +1,394 @@
-import seaborn as sns
 import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
+import matplotlib.lines as mlines
 from matplotlib import font_manager
+from matplotlib.colors import to_rgba
 
-font = font_manager.FontProperties(family='Arial',weight='medium')
-
-font_x = {'family':'Arial','weight':'medium','size': 20}
-font_y = {'family':'Arial','weight':'medium','size': 20}
-font_title = {'family':'DejaVu Sans','weight':'normal','size': 16, 'style': 'italic'}
+font_x = {'family':'Arial','weight':'medium','size': 24}
+font_x1 = {'family':'Arial Unicode MS','weight':'medium','size': 20}
+font_y = {'family':'Arial','weight':'medium','size': 16}
+font_title = {'family':'DejaVu Sans','weight':'normal','size': 15, 'style': 'italic'}
 
 plt.rcParams['font.family'] = 'Arial'
 plt.rcParams['axes.labelweight'] = 'bold'
 plt.rcParams['xtick.labelsize'] = 15
 plt.rcParams['ytick.labelsize'] = 15
 
-# df_mitochondria
-df_mitochondria_AIC = pd.read_csv('../results/mitochondria/mitochondria_AIC.csv', header=None)
-
-mitochondria_AIC = df_mitochondria_AIC.to_numpy()[1:,1:] # shape = (11,12)
-
-mitochondria_AIC_filtered = mitochondria_AIC[mitochondria_AIC != 1e5]
-max_value_mitochondria = np.max(mitochondria_AIC_filtered)
-mitochondria_AIC[mitochondria_AIC == 1e5] = max_value_mitochondria
-
-# df_UAV
-df_UAV_AIC = pd.read_csv('../results/UAV/UAV_AIC.csv', header=None)
-
-UAV_AIC = df_UAV_AIC.to_numpy()[1:,1:] # shape = (11,12)
-
-UAV_AIC_filtered = UAV_AIC[UAV_AIC != 1e5]
-max_value_UAV = np.max(UAV_AIC_filtered)
-UAV_AIC[UAV_AIC == 1e5] = max_value_UAV
-
-# df_chick_220
-df_chick_220_AIC = pd.read_csv('../results/chick/chick_220_AIC.csv', header=None)
-
-chick_220_AIC = df_chick_220_AIC.to_numpy()[1:,1:] # shape = (11,12)
-
-chick_220_AIC_filtered = chick_220_AIC[chick_220_AIC != 1e5]
-max_value_chick_220 = np.max(chick_220_AIC_filtered)
-chick_220_AIC[chick_220_AIC == 1e5] = max_value_chick_220
-
-# df_chick_230
-df_chick_230_AIC = pd.read_csv('../results/chick/chick_230_AIC.csv', header=None)
-
-chick_230_AIC = df_chick_230_AIC.to_numpy()[1:,1:] # shape = (11,12)
-
-chick_230_AIC_filtered = chick_230_AIC[chick_230_AIC != 1e5]
-max_value_chick_230 = np.max(chick_230_AIC_filtered)
-chick_230_AIC[chick_230_AIC == 1e5] = max_value_chick_230
-
-# df_chick_335
-df_chick_335_AIC = pd.read_csv('../results/chick/chick_335_AIC.csv', header=None)
-
-chick_335_AIC = df_chick_335_AIC.to_numpy()[1:,1:] # shape = (11,12)
-
-chick_335_AIC_filtered = chick_335_AIC[chick_335_AIC != 1e5]
-max_value_chick_335 = np.max(chick_335_AIC_filtered)
-chick_335_AIC[chick_335_AIC == 1e5] = max_value_chick_335
-
-# df_fish
-df_fish_AIC = pd.read_csv('../results/fish/fish_AIC.csv', header=None)
-
-fish_AIC = df_fish_AIC.to_numpy()[1:,1:] # shape = (11,12)
-
-fish_AIC_filtered = fish_AIC[fish_AIC != 1e5]
-max_value_fish = np.max(fish_AIC_filtered)
-fish_AIC[fish_AIC == 1e5] = max_value_fish
-
-# draw
-fig, axs = plt.subplots(2, 3, figsize=(15,9))
+fig, axs = plt.subplots(3, 3, figsize=(12,15))
 
 ax1, ax2, ax3 = axs[0,0], axs[0,1], axs[0,2]
 ax4, ax5, ax6 = axs[1,0], axs[1,1], axs[1,2]
+ax7, ax8, ax9 = axs[2,0], axs[2,1], axs[2,2]
 
-x_labels = [r'$1\times10^{-5}$', r'$5\times10^{-5}$', r'$1\times10^{-4}$', r'$5\times10^{-4}$', r'$1\times10^{-3}$',
-            r'$5\times10^{-3}$', r'$1\times10^{-2}$', r'$5\times10^{-2}$', r'$1\times10^{-1}$', r'$5\times10^{-1}$', '1', '5']
-y_labels = [-20, -15, -10, -5, -1, 0, 1, 5, 10, 15, 20]
+labels = ['\u2460', '\u2461', '\u2462']
+base_colors = ['cornflowerblue', 'blueviolet', 'violet']
+
+colors = [to_rgba(c, alpha=0.9) for c in base_colors]
+
+#library4######################################################################################
 
 # ax1
-heatmap = sns.heatmap(mitochondria_AIC, 
-            cmap='PuBu',
-            linewidths=0.005, 
-            linecolor='silver',
-            annot=False,
-            square=True,
-            ax=ax1,
-            cbar_kws={'shrink': 0.65
-            })
 
-ax1.scatter(4+0.5, 6+0.5, color='blueviolet', s=150, marker=(5, 1))
+values = [1, 0.04, 0.43]
+percent_text = ['100%', '4%', '43%']
 
-heatmap.set_xticks(np.arange(len(x_labels)) + 0.7)
-heatmap.set_yticks(np.arange(len(y_labels)) + 0.5)
-heatmap.set_xticklabels(x_labels, rotation=90, ha='right', fontsize=12, fontproperties=font)
-heatmap.set_yticklabels(y_labels, rotation=0, fontsize=12)
+bars = ax1.bar(labels, values, color=colors, width=0.5)
 
-heatmap.tick_params(axis='both', length=0) 
+for bar, pct in zip(bars, percent_text):
+    height = bar.get_height()
+    ax1.text(bar.get_x() + 1.25*bar.get_width()/2, height + 0.05, pct,
+             ha='center', va='bottom', fontsize=15, fontname='Arial', weight='bold')
 
-cbar = heatmap.collections[0].colorbar
-cbar.set_ticks([-1.25e5, -0.75e5])
-cbar.set_ticklabels(['-1.25', '-0.75'])
-cbar.ax.text(0.8, -1.55e5, r'$10^{5}$', ha='center', va='top', fontsize=10, fontproperties=font)
-cbar.ax.text(3.2, -0.3e5, r'$\epsilon$AIC', ha='center', va='top', fontsize=14, fontproperties=font)
-cbar.ax.tick_params(length=0)
-for label in cbar.ax.get_yticklabels():
-    label.set_fontproperties(font)
-    label.set_fontsize(12)
+ax1.set_xticks([0, 1, 2])
+ax1.set_xticklabels(labels, ha='center', fontdict=font_x1)
 
-ax1.set_title(r'Grid search: $\nu_1=1,\,\Delta \nu=1\times10^{-3}$',fontdict=font_title, pad=5)
-ax1.text(-0.12, 1.16,'a',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
-ax1.text(0.05, 1.14,'Cellular energy depletion',ha='left', transform=ax1.transAxes,color='royalblue',fontdict={'family':'DejaVu Sans','weight':'normal','size': 16, 'style': 'italic'})
+for spine in ['top', 'right']:
+    ax1.spines[spine].set_visible(False)
+for spine in ['left', 'bottom']:
+    ax1.spines[spine].set_linewidth(1)
 
-# ax2
-heatmap = sns.heatmap(UAV_AIC,
-            cmap='PuBu',
-            linewidths=0.005, 
-            linecolor='silver',
-            annot=False,
-            square=True,
-            ax=ax2,
-            cbar_kws={'shrink': 0.65
-            })
+ax1.set_ylim(-0.025,1.1)
+ax1.set_yticks([0,1])
 
-ax2.scatter(5+0.5, 6+0.5, color='blueviolet', s=150, marker=(5, 1))
+ax1.tick_params(axis='x', direction='out')
+ax1.tick_params(axis='y', direction='in')
 
-heatmap.set_xticks(np.arange(len(x_labels)) + 0.7)
-heatmap.set_yticks(np.arange(len(y_labels)) + 0.5)
-heatmap.set_xticklabels(x_labels, rotation=90, ha='right', fontsize=12, fontproperties=font)
-heatmap.set_yticklabels(y_labels, rotation=0, fontsize=12)
+ax1.set_ylabel('Bifurcation detection rate',font_y)
 
-heatmap.tick_params(axis='both', length=0) 
+ax1.text(-0.15, 1.1,'a',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 
-cbar = heatmap.collections[0].colorbar
-cbar.set_ticks([-1.5e5, -0.75e5])
-cbar.set_ticklabels(['-1.5', '-0.75'])
-cbar.ax.text(0.8, -1.82e5, r'$10^{5}$', ha='center', va='top', fontsize=10, fontproperties=font)
-cbar.ax.text(3.2, -0.07e5, r'$\epsilon$AIC', ha='center', va='top', fontsize=14, fontproperties=font)
-cbar.ax.tick_params(length=0)
-for label in cbar.ax.get_yticklabels():
-    label.set_fontproperties(font)
-    label.set_fontsize(12)
+# ax2 cusp bif errror
 
-ax2.set_title(r'Grid search: $\nu_1=1,\,\Delta \nu=5\times10^{-3}$',fontdict=font_title, pad=5)
-ax2.text(-0.12, 1.16,'b',ha='left', transform=ax2.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
-ax2.text(0.1, 1.14,'UAV autonomous flight',ha='left', transform=ax2.transAxes,color='royalblue',fontdict={'family':'DejaVu Sans','weight':'normal','size': 16, 'style': 'italic'})
+box_data_ax2 = [
+    {'med': 7.0, 'q1': 3.25, 'q3': 13.0, 'whislo': 1, 'whishi': 24, 'fliers': [29,28,29,108,31,28]},
+    {'med': 301.0, 'q1': 231.0, 'q3': 323.25, 'whislo': 92.625, 'whishi': 461.625, 'fliers': [51]},
+    {'med': 253.0, 'q1': 240.0, 'q3': 266.0, 'whislo': 230, 'whishi': 300, 'fliers': []}
+]
 
-# ax3
-heatmap = sns.heatmap(chick_220_AIC,
-            cmap='PuBu',
-            linewidths=0.005, 
-            linecolor='silver',
-            annot=False,
-            square=True,
-            ax=ax3,
-            cbar_kws={'shrink': 0.65
-            })
+boxplot = ax2.bxp(box_data_ax2, positions=[1, 2, 3], widths=0.6, showfliers=True,
+                  patch_artist=True,
+                  boxprops=dict(edgecolor='k', linewidth=1, alpha=0.8),
+                  medianprops=dict(color='k', linewidth=1.5, alpha=0.8),
+                  whiskerprops=dict(color='k', linewidth=1, alpha=0.8),
+                  capprops=dict(color='k', linewidth=1, alpha=0.8),
+                  flierprops=dict(marker='o', markersize=4, linestyle='none',
+                                  markerfacecolor='dimgray', markeredgecolor='k'))
 
-ax3.scatter(5+0.5, 5+0.5, color='blueviolet', s=150, marker=(5, 1))
+for patch, color in zip(boxplot['boxes'], colors):
+    patch.set_facecolor(color)
 
-heatmap.set_xticks(np.arange(len(x_labels)) + 0.7)
-heatmap.set_yticks(np.arange(len(y_labels)) + 0.5)
-heatmap.set_xticklabels(x_labels, rotation=90, ha='right', fontsize=12, fontproperties=font)
-heatmap.set_yticklabels(y_labels, rotation=0, fontsize=12)
+ax2.set_xticks([1, 2, 3])
+ax2.set_xticklabels(labels, ha='center', fontdict=font_x1)
 
-heatmap.tick_params(axis='both', length=0) 
+ax2.set_ylim(-(500/44),500)
+ax2.set_yticks([0,450])
 
-cbar = heatmap.collections[0].colorbar
-cbar.set_ticks([-3e14, -1.5e14])
-cbar.set_ticklabels(['-3', '-1.5'])
-cbar.ax.text(0.8, -4.5e14, r'$10^{14}$', ha='center', va='top', fontsize=10, fontproperties=font)
-cbar.ax.text(3.2, -0.2e14, r'$\epsilon$AIC', ha='center', va='top', fontsize=14, fontproperties=font)
-cbar.ax.tick_params(length=0)
-for label in cbar.ax.get_yticklabels():
-    label.set_fontproperties(font)
-    label.set_fontsize(12)
+ax2.tick_params(axis='x', direction='out')
+ax2.tick_params(axis='y', direction='in')
 
-ax3.set_title(r'Grid search: $\nu_1=0,\,\Delta \nu=5\times10^{-3}$',fontdict=font_title, pad=5)
-ax3.text(-0.12, 1.16,'c',ha='left', transform=ax3.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
-ax3.text(0.1, 1.14,'Beating chick-heart (I)',ha='left', transform=ax3.transAxes,color='royalblue',fontdict={'family':'DejaVu Sans','weight':'normal','size': 16, 'style': 'italic'})
+for spine in ['top', 'right']:
+    ax2.spines[spine].set_visible(False)
+for spine in ['left', 'bottom']:
+    ax2.spines[spine].set_linewidth(1)
+
+ax2.grid(False)
+
+ax2.set_ylabel('Bifurcation inaccuracy (timepoint)',font_y)
+ax2.yaxis.set_label_coords(-0.2, 0.5)
+
+ax2.text(-0.15, 1.1,'b',ha='left', transform=ax2.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
+
+# ax3 cusp NED
+
+box_data_ax3 = [
+    {'med': 0.0035316635604938527, 'q1': 0.002701812779790569, 'q3': 0.0048636513932439115, 'whislo': 5.670081156007021e-05, 'whishi': 0.006412955220832086, 'fliers': []},
+    {'med': 1.2438233388067883, 'q1': 1.1822537315561088, 'q3': 1.2537318635180288, 'whislo': 1.0750365336132288, 'whishi': 1.3609490614609088, 'fliers': [1.00871654]},
+    {'med': 1.242851725919981, 'q1': 1.2262518773653017, 'q3': 1.2525760827930033, 'whislo': 1.2036949610789742, 'whishi': 1.2672164677139666, 'fliers': []}
+]
+
+boxplot = ax3.bxp(box_data_ax3, positions=[1, 2, 3], widths=0.6, showfliers=True,
+                  patch_artist=True,
+                  boxprops=dict(edgecolor='k', linewidth=1, alpha=0.8),
+                  medianprops=dict(color='k', linewidth=1.5, alpha=0.8),
+                  whiskerprops=dict(color='k', linewidth=1, alpha=0.8),
+                  capprops=dict(color='k', linewidth=1, alpha=0.8),
+                  flierprops=dict(marker='o', markersize=4, linestyle='none',
+                                  markerfacecolor='dimgray', markeredgecolor='k'))
+
+for patch, color in zip(boxplot['boxes'], colors):
+    patch.set_facecolor(color)
+
+ax3.set_xticks([1, 2, 3])
+ax3.set_xticklabels(labels, ha='center', fontdict=font_x1)
+
+ax3.set_ylim(-(1.5/44),1.5)
+ax3.set_yticks([0,1.2])
+ax3.set_yticklabels(['0', '1.2'])
+
+ax3.tick_params(axis='x', direction='out')
+ax3.tick_params(axis='y', direction='in')
+
+for spine in ['top', 'right']:
+    ax3.spines[spine].set_visible(False)
+for spine in ['left', 'bottom']:
+    ax3.spines[spine].set_linewidth(1)
+
+ax3.grid(False)
+
+ax3.set_ylabel('Prediction inaccuracy (NED)',font_y)
+
+ax3.text(-0.15, 1.1,'c',ha='left', transform=ax3.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
+
+#library5######################################################################################
 
 # ax4
-heatmap = sns.heatmap(chick_230_AIC,
-            cmap='PuBu',
-            linewidths=0.005, 
-            linecolor='silver',
-            annot=False,
-            square=True,
-            ax=ax4,
-            cbar_kws={'shrink': 0.65
-            })
 
-ax4.scatter(5+0.5, 4+0.5, color='blueviolet', s=150, marker=(5, 1))
+values = [0.85, 0, 0.11]
+percent_text = ['85%', '0%', '11%']
 
-heatmap.set_xticks(np.arange(len(x_labels)) + 0.7)
-heatmap.set_yticks(np.arange(len(y_labels)) + 0.5)
-heatmap.set_xticklabels(x_labels, rotation=90, ha='right', fontsize=12, fontproperties=font)
-heatmap.set_yticklabels(y_labels, rotation=0, fontsize=12)
+bars = ax4.bar(labels, values, color=colors, width=0.5)
 
-heatmap.tick_params(axis='both', length=0) 
+for bar, pct in zip(bars, percent_text):
+    height = bar.get_height()
+    ax4.text(bar.get_x() + 1.25*bar.get_width()/2, height + 0.05, pct,
+             ha='center', va='bottom', fontsize=15, fontname='Arial', weight='bold')
 
-cbar = heatmap.collections[0].colorbar
-cbar.set_ticks([-2e16, -1e16])
-cbar.set_ticklabels(['-2', '-1'])
-cbar.ax.text(0.8, -3e16, r'$10^{16}$', ha='center', va='top', fontsize=10, fontproperties=font)
-cbar.ax.text(3.2, -0.1e16, r'$\epsilon$AIC', ha='center', va='top', fontsize=14, fontproperties=font)
-cbar.ax.tick_params(length=0)
-for label in cbar.ax.get_yticklabels():
-    label.set_fontproperties(font)
-    label.set_fontsize(12)
+ax4.set_xticks([0, 1, 2])
+ax4.set_xticklabels(labels, ha='center', fontdict=font_x1)
 
-ax4.set_title(r'Grid search: $\nu_1=-1,\,\Delta \nu=5\times10^{-3}$',fontdict=font_title, pad=5)
-ax4.text(-0.12, 1.16,'d',ha='left', transform=ax4.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
-ax4.text(0.1, 1.14,'Beating chick-heart (II)',ha='left', transform=ax4.transAxes,color='royalblue',fontdict={'family':'DejaVu Sans','weight':'normal','size': 16, 'style': 'italic'})
+for spine in ['top', 'right']:
+    ax4.spines[spine].set_visible(False)
+for spine in ['left', 'bottom']:
+    ax4.spines[spine].set_linewidth(1)
 
-# ax5
-heatmap = sns.heatmap(chick_335_AIC,
-            cmap='PuBu',
-            linewidths=0.005, 
-            linecolor='silver',
-            annot=False,
-            square=True,
-            ax=ax5,
-            cbar_kws={'shrink': 0.65
-            })
+ax4.set_ylim(-0.025,1.1)
+ax4.set_yticks([0,1])
 
-ax5.scatter(4+0.5, 4+0.5, color='blueviolet', s=150, marker=(5, 1))
+ax4.tick_params(axis='x', direction='out')
+ax4.tick_params(axis='y', direction='in')
 
-heatmap.set_xticks(np.arange(len(x_labels)) + 0.7)
-heatmap.set_yticks(np.arange(len(y_labels)) + 0.5)
-heatmap.set_xticklabels(x_labels, rotation=90, ha='right', fontsize=12, fontproperties=font)
-heatmap.set_yticklabels(y_labels, rotation=0, fontsize=12)
+ax4.set_ylabel('Bifurcation detection rate',font_y)
 
-heatmap.tick_params(axis='both', length=0) 
+ax4.text(-0.15, 1.1,'d',ha='left', transform=ax4.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
 
-cbar = heatmap.collections[0].colorbar
-cbar.set_ticks([-4e15, -2e15])
-cbar.set_ticklabels(['-4', '-2'])
-cbar.ax.text(0.8, -5.8e15, r'$10^{15}$', ha='center', va='top', fontsize=10, fontproperties=font)
-cbar.ax.text(3.2, -0.2e15, r'$\epsilon$AIC', ha='center', va='top', fontsize=14, fontproperties=font)
-cbar.ax.tick_params(length=0)
-for label in cbar.ax.get_yticklabels():
-    label.set_fontproperties(font)
-    label.set_fontsize(12)
+# ax5 cusp bif errror
 
-ax5.set_title(r'Grid search: $\nu_1=-1,\,\Delta \nu=1\times10^{-3}$',fontdict=font_title, pad=5)
-ax5.text(-0.12, 1.16,'e',ha='left', transform=ax5.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
-ax5.text(0.1, 1.14,'Beating chick-heart (III)',ha='left', transform=ax5.transAxes,color='royalblue',fontdict={'family':'DejaVu Sans','weight':'normal','size': 16, 'style': 'italic'})
+box_data_ax5 = [
+    {'med': 10.0, 'q1': 3.0, 'q3': 14.0, 'whislo': 0, 'whishi': 30, 'fliers': [37,38,48,41,73,118,35,108,144,50,49]},
+    {'med': 275.0, 'q1': 254.5, 'q3': 302.0, 'whislo': 221, 'whishi': 314, 'fliers': []}
+]
 
-# ax6
-heatmap = sns.heatmap(fish_AIC,
-            cmap='PuBu',
-            linewidths=0.005, 
-            linecolor='silver',
-            annot=False,
-            square=True,
-            ax=ax6,
-            cbar_kws={'shrink': 0.65
-            })
+boxplot = ax5.bxp(box_data_ax5, positions=[1, 3], widths=0.6, showfliers=True,
+                  patch_artist=True,
+                  boxprops=dict(edgecolor='k', linewidth=1, alpha=0.8),
+                  medianprops=dict(color='k', linewidth=1.5, alpha=0.8),
+                  whiskerprops=dict(color='k', linewidth=1, alpha=0.8),
+                  capprops=dict(color='k', linewidth=1, alpha=0.8),
+                  flierprops=dict(marker='o', markersize=4, linestyle='none',
+                                  markerfacecolor='dimgray', markeredgecolor='k'))
 
-ax6.scatter(10+0.5, 5+0.5, color='blueviolet', s=150, marker=(5, 1))
+for patch, color in zip(boxplot['boxes'], [colors[0],colors[2]]):
+    patch.set_facecolor(color)
 
-heatmap.set_xticks(np.arange(len(x_labels)) + 0.7)
-heatmap.set_yticks(np.arange(len(y_labels)) + 0.5)
-heatmap.set_xticklabels(x_labels, rotation=90, ha='right', fontsize=12, fontproperties=font)
-heatmap.set_yticklabels(y_labels, rotation=0, fontsize=12)
+ax5.text(2, 350/6, 'no bifurcation', ha='center', va='center', fontsize=15, fontweight='bold', rotation=45)
 
-heatmap.tick_params(axis='both', length=0) 
+ax5.set_xticks([1, 2, 3])
+ax5.set_xticklabels(labels, ha='center', fontdict=font_x1)
 
-cbar = heatmap.collections[0].colorbar
-cbar.set_ticks([-500, 0, 500])
-cbar.set_ticklabels(['-5', '0', '5'])
-cbar.ax.text(0.8, -750, r'$10^{2}$', ha='center', va='top', fontsize=10, fontproperties=font)
-cbar.ax.text(3.2, 820, r'$\epsilon$AIC', ha='center', va='top', fontsize=14, fontproperties=font)
-cbar.ax.tick_params(length=0)
-for label in cbar.ax.get_yticklabels():
-    label.set_fontproperties(font)
-    label.set_fontsize(12)
+ax5.set_ylim(-(350/44),350)
+ax5.set_yticks([0,300])
 
-ax6.set_title(r'Grid search: $\nu_1=0,\,\Delta \nu=1$',fontdict=font_title, pad=5)
-ax6.text(-0.12, 1.16,'f',ha='left', transform=ax6.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
-ax6.text(0.2, 1.14,'Fish community',ha='left', transform=ax6.transAxes,color='royalblue',fontdict={'family':'DejaVu Sans','weight':'normal','size': 16, 'style': 'italic'})
+ax5.tick_params(axis='x', direction='out')
+ax5.tick_params(axis='y', direction='in')
 
-plt.subplots_adjust(top=0.96, bottom=0.03, left=0.04, right=0.98, hspace=0.2, wspace=0.3)
+for spine in ['top', 'right']:
+    ax5.spines[spine].set_visible(False)
+for spine in ['left', 'bottom']:
+    ax5.spines[spine].set_linewidth(1)
+
+ax5.grid(False)
+
+ax5.set_ylabel('Bifurcation inaccuracy (timepoint)',font_y)
+ax5.yaxis.set_label_coords(-0.2, 0.5)
+
+ax5.text(-0.15, 1.1,'e',ha='left', transform=ax5.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
+
+# ax6 cusp NED
+
+box_data_ax6 = [
+    {'med': 0.0034118375933913153, 'q1': 0.001024615220432068, 'q3': 0.007266950135640166, 'whislo': 2.691014205933858e-05, 'whishi': 0.013831109471891272, 'fliers': [0.01892834]},
+    {'med': 1.136297411210664, 'q1': 1.049507844799646, 'q3': 1.1471614073946257, 'whislo': 1.0452954398020995, 'whishi': 1.1522917565665796, 'fliers': []}
+]
+
+boxplot = ax6.bxp(box_data_ax6, positions=[1, 3], widths=0.6, showfliers=True,
+                  patch_artist=True,
+                  boxprops=dict(edgecolor='k', linewidth=1, alpha=0.8),
+                  medianprops=dict(color='k', linewidth=1.5, alpha=0.8),
+                  whiskerprops=dict(color='k', linewidth=1, alpha=0.8),
+                  capprops=dict(color='k', linewidth=1, alpha=0.8),
+                  flierprops=dict(marker='o', markersize=4, linestyle='none',
+                                  markerfacecolor='dimgray', markeredgecolor='k'))
+
+for patch, color in zip(boxplot['boxes'], [colors[0],colors[2]]):
+    patch.set_facecolor(color)
+
+ax6.text(2, 1.2/6, 'no bifurcation', ha='center', va='center', fontsize=15, fontweight='bold', rotation=45)
+
+ax6.set_xticks([1, 2, 3])
+ax6.set_xticklabels(labels, ha='center', fontdict=font_x1)
+
+ax6.set_ylim(-(1.2/44),1.2)
+ax6.set_yticks([0,1])
+ax6.set_yticklabels(['0', '1'])
+
+ax6.tick_params(axis='x', direction='out')
+ax6.tick_params(axis='y', direction='in')
+
+for spine in ['top', 'right']:
+    ax6.spines[spine].set_visible(False)
+for spine in ['left', 'bottom']:
+    ax6.spines[spine].set_linewidth(1)
+
+ax6.grid(False)
+
+ax6.set_ylabel('Prediction inaccuracy (NED)',font_y,labelpad=17)
+
+ax6.text(-0.15, 1.1,'f',ha='left', transform=ax6.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
+
+xlim = ax6.get_xlim()
+
+#library6######################################################################################
+
+# ax7
+
+values = [0.6, 0, 0]
+percent_text = ['60%', '0%', '0%']
+
+bars = ax7.bar(labels, values, color=colors, width=0.5)
+
+for bar, pct in zip(bars, percent_text):
+    height = bar.get_height()
+    ax7.text(bar.get_x() + 1.25*bar.get_width()/2, height + 0.05, pct,
+             ha='center', va='bottom', fontsize=15, fontname='Arial', weight='bold')
+
+ax7.set_xticks([0, 1, 2])
+ax7.set_xticklabels(labels, ha='center', fontdict=font_x1)
+
+for spine in ['top', 'right']:
+    ax7.spines[spine].set_visible(False)
+for spine in ['left', 'bottom']:
+    ax7.spines[spine].set_linewidth(1)
+
+ax7.set_ylim(-0.025,1.1)
+ax7.set_yticks([0,1])
+
+ax7.tick_params(axis='x', direction='out')
+ax7.tick_params(axis='y', direction='in')
+
+ax7.set_ylabel('Bifurcation detection rate',font_y)
+
+ax7.text(-0.15, 1.1,'g',ha='left', transform=ax7.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
+
+# ax8 cusp bif errror
+
+box_data_ax8 = [
+    {'med': 18.5, 'q1': 13.0, 'q3': 31.0, 'whislo': 1, 'whishi': 50, 'fliers': [78,103,63,126]}
+]
+
+boxplot = ax8.bxp(box_data_ax8, positions=[1], widths=0.6, showfliers=True,
+                  patch_artist=True,
+                  boxprops=dict(edgecolor='k', linewidth=1, alpha=0.8),
+                  medianprops=dict(color='k', linewidth=1.5, alpha=0.8),
+                  whiskerprops=dict(color='k', linewidth=1, alpha=0.8),
+                  capprops=dict(color='k', linewidth=1, alpha=0.8),
+                  flierprops=dict(marker='o', markersize=4, linestyle='none',
+                                  markerfacecolor='dimgray', markeredgecolor='k'))
+
+for patch, color in zip(boxplot['boxes'], [colors[0],colors[2]]):
+    patch.set_facecolor(color)
+
+ax8.text(2, 150/6, 'no bifurcation', ha='center', va='center', fontsize=15, fontweight='bold', rotation=45)
+ax8.text(3, 150/6, 'no bifurcation', ha='center', va='center', fontsize=15, fontweight='bold', rotation=45)
+
+ax8.set_xticks([1, 2, 3])
+ax8.set_xticklabels(labels, ha='center', fontdict=font_x1)
+ax8.set_xlim(xlim)
+
+ax8.set_ylim(-(150/44),150)
+ax8.set_yticks([0,120])
+
+ax8.tick_params(axis='x', direction='out')
+ax8.tick_params(axis='y', direction='in')
+
+for spine in ['top', 'right']:
+    ax8.spines[spine].set_visible(False)
+for spine in ['left', 'bottom']:
+    ax8.spines[spine].set_linewidth(1)
+
+ax8.grid(False)
+
+ax8.set_ylabel('Bifurcation inaccuracy (timepoint)',font_y)
+ax8.yaxis.set_label_coords(-0.2, 0.5)
+
+ax8.text(-0.15, 1.1,'h',ha='left', transform=ax8.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
+
+# ax9 cusp NED
+
+box_data_ax9 = [
+    {'med': 0.002795616591624174, 'q1':  0.0013431631226988089, 'q3': 0.004858445512180334, 'whislo': 5.899334200037905e-05, 'whishi':0.009981968236733864, 'fliers': [0.0125806]}
+]
+
+boxplot = ax9.bxp(box_data_ax9, positions=[1], widths=0.6, showfliers=True,
+                  patch_artist=True,
+                  boxprops=dict(edgecolor='k', linewidth=1, alpha=0.8),
+                  medianprops=dict(color='k', linewidth=1.5, alpha=0.8),
+                  whiskerprops=dict(color='k', linewidth=1, alpha=0.8),
+                  capprops=dict(color='k', linewidth=1, alpha=0.8),
+                  flierprops=dict(marker='o', markersize=4, linestyle='none',
+                                  markerfacecolor='dimgray', markeredgecolor='k'))
+
+for patch, color in zip(boxplot['boxes'], colors):
+    patch.set_facecolor(color)
+
+ax9.text(2, 0.015/6, 'no bifurcation', ha='center', va='center', fontsize=15, fontweight='bold', rotation=45)
+ax9.text(3, 0.015/6, 'no bifurcation', ha='center', va='center', fontsize=15, fontweight='bold', rotation=45)
+
+ax9.set_xticks([1, 2, 3])
+ax9.set_xticklabels(labels, ha='center', fontdict=font_x1)
+ax9.set_xlim(xlim)
+
+ax9.set_ylim(-(0.015/44),0.015)
+ax9.set_yticks([0,0.012])
+ax9.set_yticklabels(['0', '0.012'])
+
+ax9.tick_params(axis='x', direction='out')
+ax9.tick_params(axis='y', direction='in')
+
+for spine in ['top', 'right']:
+    ax9.spines[spine].set_visible(False)
+for spine in ['left', 'bottom']:
+    ax9.spines[spine].set_linewidth(1)
+
+ax9.grid(False)
+
+ax9.set_ylabel('Prediction inaccuracy (NED)',font_y)
+
+ax9.text(-0.15, 1.1,'i',ha='left', transform=ax9.transAxes,fontdict={'family':'Arial','size':30,'weight':'bold'})
+
+#######################################################################################
+
+plt.subplots_adjust(top=0.88, bottom=0.03, left=0.05, right=0.98, hspace=0.6, wspace=0.4)
+
+fig.text(0.5, 0.95, 'Degree-4 basis function library', ha='center', va='center',fontsize=25,fontname='Arial',color='navy')
+fig.text(0.5, 0.63, 'Degree-5 basis function library', ha='center', va='center',fontsize=25,fontname='Arial',color='navy')
+fig.text(0.5, 0.3, 'Degree-6 basis function library', ha='center', va='center',fontsize=25,fontname='Arial',color='navy')
+
+legend_v = mlines.Line2D([], [], color='cornflowerblue', linestyle='-',linewidth=20)
+legend_p = mlines.Line2D([], [], color='blueviolet', linestyle='-',linewidth=20)
+legend_t = mlines.Line2D([], [], color='violet', linestyle='-',linewidth=20)
+
+fig.legend(handles = [legend_v, legend_p, legend_t],
+            labels = ['\u2460  Optimal driving variable','\u2461  Forcing parameters','\u2462  Time variable'],
+              loc='upper center', bbox_to_anchor=(0.5,1.01), ncol=3, frameon=False, handlelength=1.5,
+              prop=font_manager.FontProperties(family='Arial Unicode MS', size=20))
+
 plt.savefig('../figures/SFIG2.pdf',format='pdf')
-plt.savefig('/Users/zhugchzo/Desktop/3paper_fig/SFIG2.png',format='png',dpi=600)
