@@ -1,0 +1,2 @@
+cte,x,p,sum_sin(xj-xi),x^2,px,xsum_sin(xj-xi),p^2,psum_sin(xj-xi),sum_sin^2(xj-xi)
+0.0,0.001986110279856669,0.0,0.0,0.0,0.0,0.0,0.0,0.04986466647734505,0.0

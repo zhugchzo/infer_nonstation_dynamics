@@ -1,0 +1,2 @@
+cte,x,p,sum_sin(xj-xi),x^2,px,xsum_sin(xj-xi),p^2,psum_sin(xj-xi),sum_sin^2(xj-xi),initial_theta,delta_theta
+0.0,0.334345799967028,0.0,-1484.0155663144287,0.0,-0.022156391642630262,0.0,0.0,98.93440654213842,0.0,15.0,1e-05

@@ -1,126 +1,71 @@
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
-from matplotlib import font_manager
+from scipy.stats import kendalltau
 
-font_x = {'family':'Arial','weight':'medium','size': 25}
-font_y = {'family':'Arial','weight':'medium','size': 25}
-font_title = {'family':'DejaVu Sans','weight':'normal','size': 25, 'style': 'italic'}
+font_x = {'family':'Arial','weight':'normal','size': 28}
+font_y1 = {'family':'Arial','weight':'normal','size': 20}
+font_y2 = {'family':'Arial','weight':'normal','size': 24}
 
 plt.rcParams['font.family'] = 'Arial'
 plt.rcParams['axes.labelweight'] = 'bold'
-plt.rcParams['xtick.labelsize'] = 20
-plt.rcParams['ytick.labelsize'] = 20
 
-# df for ax1
-df_cusp_ned = pd.read_csv('../results/NED/cusp_NED.csv')
-# df for ax2
-df_Koscillators_ned = pd.read_csv('../results/NED/Koscillators_NED.csv')
+df_dom_eval = pd.read_csv('../results/fish/dom_eval.csv')
+df_var = pd.read_csv('../results/fish/fish_var.csv')
 
-fig, axs = plt.subplots(1, 2, figsize=(12,7))
+col = ['Aurelia.sp', 'Plotosus.japonicus', 'Sebastes.cheni', 'Trachurus.japonicus', 'Girella.punctata',
+       'Pseudolabrus.sieboldi', 'Parajulis.poecilopterus', 'Halichoeres.tenuispinnis', 'Chaenogobius.gulosus',
+       'Pterogobius.zonoleucus', 'Tridentiger.trigonocephalus', 'Siganus.fuscescens', 'Sphyraena.pinguis', 'Rudarius.ercodes']
 
-ax1, ax2 = axs[0], axs[1]
+N = len(col)
 
-# ax1
-cusp_ned = df_cusp_ned[['mean_NED','mean_NED_ab','mean_NED_t']].values
-cusp_lower = df_cusp_ned[['lower_NED','lower_NED_ab','lower_NED_t']].values
-cusp_upper = df_cusp_ned[['upper_NED','upper_NED_ab','upper_NED_t']].values
+var_tseries = df_var.values.reshape(-1)
 
-len_ax1 = len(cusp_ned)
-t_ax1 = np.arange(0,len_ax1)
+t = df_dom_eval['Time'][:275]
+dom_eval = df_dom_eval['dom_eval'].values.reshape(-1)[:275]
 
-ned_ax1 = cusp_ned[:,0]
-ned_ab_ax1 = cusp_ned[:,1]
-ned_t_ax1 = cusp_ned[:,2]
+tau, p_value = kendalltau(var_tseries, dom_eval)
 
-lower_ax1 = cusp_lower[:,0]
-lower_ab_ax1 = cusp_lower[:,1]
-lower_t_ax1 = cusp_lower[:,2]
+print(f"Kendall's tau: {tau}")
+print(f"P-value: {p_value}")
 
-upper_ax1 = cusp_upper[:,0]
-upper_ab_ax1 = cusp_upper[:,1]
-upper_t_ax1 = cusp_upper[:,2]
+fig, ax1 = plt.subplots(figsize=(12,6))
 
-ax1.plot(t_ax1,ned_ax1,c='cornflowerblue',linewidth=5,alpha=0.9,zorder=2)
-ax1.fill_between(t_ax1,lower_ax1,upper_ax1,color='cornflowerblue',alpha=0.15,linewidth=0,zorder=2)
+ax1.plot(t, dom_eval, c='black', linewidth=2, zorder=2)
 
-ax1.plot(t_ax1,ned_ab_ax1,c='blueviolet',linewidth=5,alpha=0.9,zorder=1)
-ax1.fill_between(t_ax1,lower_ab_ax1,upper_ab_ax1,color='blueviolet',alpha=0.15,linewidth=0,zorder=1)
+for i in [0,2,4,6,8]:
+       ax1.axvspan(t[14+24*i],t[37+24*i], color='silver', alpha=0.3, linewidth=0, zorder=1)
+ax1.axvspan(t[14+24*10],t[274], color='silver', alpha=0.3, linewidth=0, zorder=1)
 
-ax1.plot(t_ax1,ned_t_ax1,c='violet',linewidth=5,alpha=0.9,zorder=1)
-ax1.fill_between(t_ax1,lower_t_ax1,upper_t_ax1,color='violet',alpha=0.15,linewidth=0,zorder=1)
+positions = list()
+for i in [0,2,4,6,8,10]:
+       positions.append(t[25+24*i])
 
-ax1.set_xticks([0,250,500])
-ax1.set_ylim(-0.04,0.44)
-ax1.set_yticks([0,0.4])
-ax1.set_yticklabels(['0','0.4'])
+years = ['2003','2005', '2007', '2009', '2011', '2013']
+ax1.set_xticks(positions)
+ax1.set_xticklabels(years, fontsize=18) 
+ax1.tick_params(axis='x', which='both', bottom=False)
 ax1.tick_params(direction='in')
 
-ax1.set_xlabel('Timepoints',font_x)
-ax1.set_ylabel('Prediction inaccuracy (NED)',font_y)
-ax1.yaxis.set_label_coords(-0.15, 0.5)
+ax1.set_xlabel('Year',font_x,labelpad=10)
 
-ax1.set_title('Cusp bifurcation',fontdict=font_title,y=1.01)
-ax1.text(-0.18, 1,'a',ha='left', transform=ax1.transAxes,fontdict={'family':'Arial','size':35,'weight':'bold'})
+ax1.set_yticks([0,6000,12000])
+ax1.set_yticklabels(['0','6','12'], fontsize=18) 
 
-# ax2
-Koscillators_ned = df_Koscillators_ned[['mean_NED','mean_NED_p','mean_NED_t']].values
-Koscillators_lower = df_Koscillators_ned[['lower_NED','lower_NED_p','lower_NED_t']].values
-Koscillators_upper = df_Koscillators_ned[['upper_NED','upper_NED_p','upper_NED_t']].values
+ax1.set_ylabel(r'Modulus of the dominant eigenvalue ($10^3$)',font_y1,labelpad=10)
 
-len_ax2 = len(Koscillators_ned)
-t_ax2 = np.arange(0,len_ax2)
+ax2 = ax1.twinx()
+ax2.plot(t, var_tseries, c='crimson', linestyle='--', linewidth=2, zorder=2)
 
-ned_ax2 = Koscillators_ned[:,0]
-ned_ab_ax2 = Koscillators_ned[:,1]
-ned_t_ax2 = Koscillators_ned[:,2]
-
-lower_ax2 = Koscillators_lower[:,0]
-lower_ab_ax2 = Koscillators_lower[:,1]
-lower_t_ax2 = Koscillators_lower[:,2]
-
-upper_ax2 = Koscillators_upper[:,0]
-upper_ab_ax2 = Koscillators_upper[:,1]
-upper_t_ax2 = Koscillators_upper[:,2]
-
-ax2.plot(t_ax2,ned_ax2,c='cornflowerblue',linewidth=5,alpha=0.9,zorder=2)
-ax2.fill_between(t_ax2,lower_ax2,upper_ax2,color='cornflowerblue',alpha=0.15,linewidth=0,zorder=2)
-
-ax2.plot(t_ax2,ned_ab_ax2,c='blueviolet',linewidth=5,alpha=0.9,zorder=1)
-ax2.fill_between(t_ax2,lower_ab_ax2,upper_ab_ax2,color='blueviolet',alpha=0.15,linewidth=0,zorder=1)
-
-ax2.plot(t_ax2,ned_t_ax2,c='violet',linewidth=5,alpha=0.9,zorder=1)
-ax2.fill_between(t_ax2,lower_t_ax2,upper_t_ax2,color='violet',alpha=0.15,linewidth=0,zorder=1)
-
-ax2.set_xticks([0,350,700])
-ax2.set_ylim(-0.0025,0.0275)
-ax2.set_yticks([0,0.025])
-ax2.set_yticklabels(['0','0.025'])
+ax2.set_yticks([0,0.75,1.5])
+ax2.set_yticklabels(['0','0.75','1.5'], fontsize=18)
 ax2.tick_params(direction='in')
 
-ax2.set_xlabel('Timepoints',font_x)
-ax2.set_ylabel('Prediction inaccuracy (NED)',font_y)
-ax2.yaxis.set_label_coords(-0.2, 0.5)
+ax2.set_ylabel('Variance',font_y2,labelpad=15)
 
-ax2.set_title('Kuramoto oscillators',fontdict=font_title,y=1.01)
-ax2.text(-0.18, 1,'b',ha='left', transform=ax2.transAxes,fontdict={'family':'Arial','size':35,'weight':'bold'})
+legend_dom_eval = mlines.Line2D([], [], color='black', marker='none', linestyle='-', linewidth=2)
+legend_var = mlines.Line2D([], [], color='crimson', marker='none', linestyle='--', linewidth=2)
+ax1.legend(handles=[legend_dom_eval,legend_var],labels=['Modulus of the \ndominant eigenvalue','Variance'],loc='center',frameon=False,bbox_to_anchor=(0.85, 0.9), prop={'size':15})
 
-# legend
-legend_v = mlines.Line2D([], [], color='cornflowerblue', marker='none', linestyle='-', linewidth=5,alpha=0.9)
-legend_p = mlines.Line2D([], [], color='blueviolet', marker='none', linestyle='-', linewidth=5,alpha=0.9)
-legend_t = mlines.Line2D([], [], color='violet', marker='none', linestyle='-', linewidth=5,alpha=0.9)
-
-fig.legend(
-    handles=[legend_v, legend_p, legend_t],
-    labels=['Our approach', 'RC with forcing parameters', 'RC with time variable'],
-    loc='upper center',
-    bbox_to_anchor=(0.5, 1.025),
-    ncol=3,
-    frameon=False,
-    markerscale=1.5,
-    prop=font_manager.FontProperties(family='Arial Unicode MS', size=20)
-)
-
-plt.subplots_adjust(top=0.8, bottom=0.1, left=0.1, right=0.98, wspace=0.5)
+plt.subplots_adjust(top=0.98, bottom=0.14, left=0.07, right=0.9)
 plt.savefig('../figures/SFIG10.pdf',format='pdf')

@@ -440,7 +440,7 @@ legend_t = mlines.Line2D([], [], color='violet', linestyle='-',linewidth=3,marke
 fig.legend(handles = [legend_v, legend_p, legend_t],
             labels = ['\u2460  Optimal driving variable','\u2461  Forcing parameters','\u2462  Time variable'],
               loc='upper center', bbox_to_anchor=(0.5,1.01), ncol=3, frameon=False, 
-              prop=font_manager.FontProperties(family='Arial Unicode MS', size=20))
+              prop=font_manager.FontProperties(family='Arial', size=20))
 
 fig.supxlabel(r'Basis function library with degree $k$',x=0.5, y=0, fontproperties=font_x)
 
