@@ -1,8 +1,8 @@
-# Revealing dynamics of non-stationary complex systems from data
+# Revealing dynamics of non-autonomous complex systems from data
 
 This is the code repository to accompnay the article:
 
-***Revealing dynamics of non-stationary complex systems from data.*** *Chengzuo Zhuge, Zheng Jiang, Zhefan Xu, Wei Chen.*
+***Revealing dynamics of non-autonomous complex systems from data.*** *Chengzuo Zhuge, Zheng Jiang, Zhefan Xu, Wei Chen.*
 
 # Requirements
 
