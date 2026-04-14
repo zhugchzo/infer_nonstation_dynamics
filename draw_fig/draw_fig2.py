@@ -328,6 +328,3 @@ fig.patches.append(arrow4)
 plt.subplots_adjust(top=0.92, bottom=0.06, left=0.04, right=1, hspace=0.5, wspace=0.3)
 plt.savefig('../figures/FIG2.pdf',format='pdf')
 plt.savefig('/Users/zhugchzo/Desktop/3paper_fig/FIG2.png',format='png',dpi=600)
-
-
-
